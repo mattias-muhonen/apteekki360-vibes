@@ -1,0 +1,283 @@
+@import '../landing/Landing.css';
+
+.lab-overview {
+  margin-bottom: 4rem;
+}
+
+.overview-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.overview-card {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  text-align: center;
+}
+
+.overview-card h3 {
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.result-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1976d2;
+  margin-bottom: 0.5rem;
+}
+
+.result-label {
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.result-status {
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.result-status.normal {
+  background: #e8f5e8;
+  color: #4caf50;
+}
+
+.result-status.improving {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.result-action {
+  background: #1976d2;
+  color: #fff;
+  padding: 0.7rem 1.5rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 1rem;
+  transition: background 0.2s;
+}
+
+.result-action:hover {
+  background: #1565c0;
+}
+
+.results-table-section {
+  margin-bottom: 4rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.section-header h2 {
+  color: #333;
+  margin: 0;
+}
+
+.add-result-button {
+  background: #1976d2;
+  color: #fff;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-result-button:hover {
+  background: #1565c0;
+}
+
+.results-table {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr 1.5fr 1fr;
+  gap: 1rem;
+  background: #f8fafc;
+  padding: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #e1e5e9;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr 1.5fr 1fr;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e1e5e9;
+  align-items: center;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-row:hover {
+  background: #f8fafc;
+}
+
+.status {
+  padding: 0.4rem 0.8rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.status.normal {
+  background: #e8f5e8;
+  color: #4caf50;
+}
+
+.status.low-normal {
+  background: #fff3e0;
+  color: #ff9800;
+}
+
+.upload-section {
+  margin-bottom: 4rem;
+}
+
+.upload-card {
+  background: #fff;
+  padding: 3rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  text-align: center;
+  border: 2px dashed #e1e5e9;
+  transition: border-color 0.2s;
+}
+
+.upload-card:hover {
+  border-color: #1976d2;
+}
+
+.upload-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.upload-card h3 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.upload-card p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.upload-button {
+  background: #1976d2;
+  color: #fff;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.upload-button:hover {
+  background: #1565c0;
+}
+
+.member-note {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #e3f2fd;
+  border-radius: 0.5rem;
+  color: #1976d2;
+  font-size: 0.9rem;
+}
+
+.recommendations-section {
+  background: #fff;
+  padding: 3rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  margin-bottom: 3rem;
+}
+
+.recommendations-section h2 {
+  color: #333;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.recommendation-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.recommendation-item {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1.5rem;
+  background: #f8fafc;
+  border-radius: 0.8rem;
+}
+
+.rec-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.rec-content h4 {
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.rec-content p {
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .table-header,
+  .table-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .table-header div,
+  .table-row div {
+    text-align: left;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .upload-card {
+    padding: 2rem;
+  }
+}

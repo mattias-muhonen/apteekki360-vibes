@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import './Chat.css';
+import Page from '../../components/Page';
+import { Button, Input } from '../../components/ui';
+import { cn } from '../../lib/utils';
 
 interface Message {
   id: string;
@@ -36,6 +38,7 @@ const Chat = () => {
   });
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const chatScript = [
     {
@@ -189,6 +192,11 @@ const Chat = () => {
     
     setInput('');
 
+    // Focus the input field after sending message
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
+
     // Simulate AI typing and response
     simulateTyping(() => {
       if (currentStep < chatScript.length - 1) {
@@ -236,90 +244,125 @@ To get your detailed results and personalized product recommendations, you can v
   };
 
   return (
-    <div className="chat-container">
-      <div className="chat-header">
-        <h2>AI Health Assessment</h2>
-        <div className="progress-bar">
-          <div 
-            className="progress-fill" 
-            style={{ width: `${((currentStep + 1) / chatScript.length) * 100}%` }}
-          ></div>
-        </div>
-        <span className="progress-text">
-          {isComplete ? 'Complete' : `Question ${currentStep + 1} of ${chatScript.length}`}
-        </span>
-      </div>
-
-      <div className="chat-messages">
-        {messages.map((message) => (
-          <div key={message.id} className={`message ${message.isUser ? 'user' : 'ai'}`}>
-            <div className="message-content">
-              <pre className="message-text">{message.text}</pre>
-              <span className="message-time">
-                {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </span>
-            </div>
+    <Page title="AI Health Assessment" subtitle="Get personalized health insights through our intelligent chat system" showGradientHeader={false}>
+      <div className="h-screen flex flex-col">
+        {/* Chat Header */}
+        <div className="bg-white border-b border-gray-200 px-6 py-4 sticky top-16">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">AI Health Assessment</h2>
+          <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+            <div 
+              className="bg-purple-600 h-2 rounded-full transition-all duration-300" 
+              style={{ width: `${((currentStep + 1) / chatScript.length) * 100}%` }}
+            ></div>
           </div>
-        ))}
-        
-        {isTyping && (
-          <div className="message ai">
-            <div className="message-content">
-              <div className="typing-indicator">
-                <span></span>
-                <span></span>
-                <span></span>
+          <span className="text-sm text-gray-600">
+            {isComplete ? 'Complete' : `Question ${currentStep + 1} of ${chatScript.length}`}
+          </span>
+        </div>
+
+        {/* Messages Area */}
+        <div className="flex-1 overflow-y-auto bg-gray-50">
+          <div className="max-w-[720px] mx-auto px-6 py-4 space-y-4">
+            {messages.map((message) => (
+              <div key={message.id} className={cn(
+                "flex",
+                message.isUser ? "justify-end" : "justify-start"
+              )}>
+                <div className={cn(
+                  "max-w-xs lg:max-w-md px-4 py-2 rounded-lg",
+                  message.isUser 
+                    ? "bg-purple-600 text-white" 
+                    : "bg-white text-gray-900 border border-gray-200"
+                )}>
+                  <pre className="whitespace-pre-wrap text-sm font-sans">{message.text}</pre>
+                  <span className={cn(
+                    "text-xs mt-1 block",
+                    message.isUser ? "text-purple-100" : "text-gray-500"
+                  )}>
+                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
               </div>
+            ))}
+            
+            {isTyping && (
+              <div className="flex justify-start">
+                <div className="bg-white text-gray-900 border border-gray-200 max-w-xs lg:max-w-md px-4 py-2 rounded-lg">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div ref={messagesEndRef} />
+          </div>
+        </div>
+
+        {/* Input Section */}
+        {!isComplete && (
+          <div className="bg-white border-t border-gray-200 sticky bottom-0">
+            <div className="max-w-[720px] mx-auto px-6 py-4">
+              {suggestedResponses().length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {suggestedResponses().map((suggestion, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setInput(suggestion);
+                        setTimeout(() => {
+                          inputRef.current?.focus();
+                        }, 100);
+                      }}
+                      className="text-left"
+                    >
+                      {suggestion}
+                    </Button>
+                  ))}
+                </div>
+              )}
+              
+              <form onSubmit={handleSubmit} className="flex gap-2">
+                <Input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Type your response here..."
+                  disabled={isTyping}
+                  className="flex-1"
+                />
+                <Button type="submit" disabled={!input.trim() || isTyping}>
+                  Send
+                </Button>
+              </form>
             </div>
           </div>
         )}
-        
-        <div ref={messagesEndRef} />
-      </div>
 
-      {!isComplete && (
-        <div className="chat-input-section">
-          {suggestedResponses().length > 0 && (
-            <div className="suggested-responses">
-              {suggestedResponses().map((suggestion, index) => (
-                <button
-                  key={index}
-                  className="suggestion-chip"
-                  onClick={() => setInput(suggestion)}
-                >
-                  {suggestion}
-                </button>
-              ))}
+        {/* Completion Actions */}
+        {isComplete && (
+          <div className="bg-white border-t border-gray-200 sticky bottom-0">
+            <div className="max-w-[720px] mx-auto px-6 py-4 space-y-3">
+              <Button asChild className="w-full">
+                <Link to="/recommendations">
+                  View Detailed Results
+                </Link>
+              </Button>
+              <Button variant="outline" asChild className="w-full">
+                <Link to="/auth">
+                  Create Account to Save Results
+                </Link>
+              </Button>
             </div>
-          )}
-          
-          <form onSubmit={handleSubmit} className="chat-form">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Type your response here..."
-              className="chat-input"
-              disabled={isTyping}
-            />
-            <button type="submit" className="send-button" disabled={!input.trim() || isTyping}>
-              Send
-            </button>
-          </form>
-        </div>
-      )}
-
-      {isComplete && (
-        <div className="chat-actions">
-          <Link to="/recommendations" className="action-button primary">
-            View Detailed Results
-          </Link>
-          <Link to="/auth" className="action-button secondary">
-            Create Account to Save Results
-          </Link>
-        </div>
-      )}
-    </div>
+          </div>
+        )}
+      </div>
+    </Page>
   );
 };
 

@@ -1,0 +1,420 @@
+@import '../landing/Landing.css';
+
+.kpi-section {
+  margin-bottom: 4rem;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.kpi-card {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+}
+
+.kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.kpi-header h3 {
+  color: #333;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.trend {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.trend.up {
+  color: #4caf50;
+}
+
+.trend.down {
+  color: #f44336;
+}
+
+.kpi-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1976d2;
+  margin-bottom: 0.5rem;
+}
+
+.kpi-status {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.kpi-status.normal {
+  color: #4caf50;
+}
+
+.kpi-status.good {
+  color: #4caf50;
+}
+
+.kpi-status.attention {
+  color: #ff9800;
+}
+
+.kpi-chart {
+  display: flex;
+  align-items: end;
+  gap: 0.3rem;
+  height: 40px;
+}
+
+.chart-bar {
+  flex: 1;
+  background: linear-gradient(to top, #1976d2, #42a5f5);
+  border-radius: 2px;
+  min-height: 10px;
+}
+
+.health-plan-section {
+  margin-bottom: 4rem;
+}
+
+.plan-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.plan-item {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.plan-checkbox {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.plan-item.completed .plan-checkbox {
+  background: #4caf50;
+  color: #fff;
+}
+
+.plan-item.in-progress .plan-checkbox {
+  background: #ff9800;
+  color: #fff;
+}
+
+.plan-item:not(.completed):not(.in-progress) .plan-checkbox {
+  background: #e1e5e9;
+  color: #666;
+}
+
+.plan-content {
+  flex: 1;
+}
+
+.plan-content h4 {
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.plan-content p {
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.plan-status {
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.plan-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.plan-button {
+  background: #1976d2;
+  color: #fff;
+  padding: 0.7rem 1.5rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.plan-button:hover {
+  background: #1565c0;
+}
+
+.recommendations-quick {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  margin-bottom: 3rem;
+}
+
+.recommendations-quick h2 {
+  color: #333;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.quick-recs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.quick-rec-card {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 0.8rem;
+  text-align: center;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.quick-rec-card:hover {
+  border-color: #1976d2;
+  transform: translateY(-2px);
+}
+
+.quick-rec-card h4 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.rec-price {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1976d2;
+  margin-bottom: 1rem;
+}
+
+.rec-button {
+  background: #1976d2;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.4rem;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-block;
+  transition: background 0.2s;
+}
+
+.rec-button:hover {
+  background: #1565c0;
+}
+
+/* Lab Results Section */
+.lab-results-section {
+  margin-bottom: 4rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.section-header h2 {
+  color: #333;
+  margin: 0;
+}
+
+.add-result-button {
+  background: #1976d2;
+  color: #fff;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-result-button:hover {
+  background: #1565c0;
+}
+
+.results-table {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr 1.5fr 1fr;
+  gap: 1rem;
+  background: #f8fafc;
+  padding: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #e1e5e9;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr 1.5fr 1fr;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e1e5e9;
+  align-items: center;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-row:hover {
+  background: #f8fafc;
+}
+
+.status {
+  padding: 0.4rem 0.8rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.status.normal {
+  background: #e8f5e8;
+  color: #4caf50;
+}
+
+.status.low-normal {
+  background: #fff3e0;
+  color: #ff9800;
+}
+
+.upload-section {
+  margin-top: 2rem;
+}
+
+.upload-card {
+  background: #fff;
+  padding: 3rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  text-align: center;
+  border: 2px dashed #e1e5e9;
+  transition: border-color 0.2s;
+}
+
+.upload-card:hover {
+  border-color: #1976d2;
+}
+
+.upload-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.upload-card h3 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.upload-card p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.upload-button {
+  background: #1976d2;
+  color: #fff;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.upload-button:hover {
+  background: #1565c0;
+}
+
+.member-note {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #e3f2fd;
+  border-radius: 0.5rem;
+  color: #1976d2;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .plan-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .plan-actions {
+    justify-content: center;
+  }
+  
+  .kpi-value {
+    font-size: 2rem;
+  }
+  
+  .table-header,
+  .table-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .table-header div,
+  .table-row div {
+    text-align: left;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .upload-card {
+    padding: 2rem;
+  }
+}
