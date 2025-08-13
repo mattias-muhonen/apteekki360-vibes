@@ -5,6 +5,8 @@ import OpenAI from 'openai';
 import { useAuth } from '../../contexts/AuthContext';
 import UserDataService from '../../services/userDataService';
 
+console.log('api key:', import.meta.env.VITE_OPENAI_API_KEY)
+
 // Initialize OpenAI client
 const openai = new OpenAI({
     apiKey: import.meta.env.VITE_OPENAI_API_KEY,
