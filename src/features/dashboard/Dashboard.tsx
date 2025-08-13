@@ -1,8 +1,94 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import Page from '../../components/Page';
 import { Button, Card, CardContent, CardHeader, CardTitle } from '../../components/ui';
+import LabUpload from '../lab-upload/LabUpload';
 
-const Dashboard = () => (
+interface LabResult {
+  test: string;
+  result: string;
+  referenceRange: string;
+  status: 'Normal' | 'Low' | 'High' | 'Critical';
+  unit?: string;
+}
+
+interface ProcessedResults {
+  date: string;
+  results: LabResult[];
+  confidence: number;
+}
+
+interface LabEntry {
+  date: string;
+  test: string;
+  result: string;
+  referenceRange: string;
+  status: 'Normal' | 'Low' | 'High' | 'Critical';
+}
+
+const Dashboard = () => {
+  // Initial lab results data
+  const [labResults, setLabResults] = useState<LabEntry[]>([
+    {
+      date: "Dec 15, 2024",
+      test: "Total Testosterone",
+      result: "485 ng/dL",
+      referenceRange: "300-1000 ng/dL",
+      status: "Normal"
+    },
+    {
+      date: "Dec 15, 2024",
+      test: "Free Testosterone", 
+      result: "12.4 pg/mL",
+      referenceRange: "8.7-25.1 pg/mL",
+      status: "Normal"
+    },
+    {
+      date: "Dec 15, 2024",
+      test: "Vitamin D",
+      result: "28 ng/mL", 
+      referenceRange: "30-100 ng/mL",
+      status: "Low"
+    },
+    {
+      date: "Nov 20, 2024",
+      test: "Total Testosterone",
+      result: "445 ng/dL",
+      referenceRange: "300-1000 ng/dL", 
+      status: "Normal"
+    }
+  ]);
+
+  const handleLabResultsAdded = (processedResults: ProcessedResults) => {
+    // Convert the processed results to our lab entry format
+    const newEntries: LabEntry[] = processedResults.results.map(result => ({
+      date: processedResults.date,
+      test: result.test,
+      result: result.result,
+      referenceRange: result.referenceRange,
+      status: result.status
+    }));
+
+    // Add new results to the top of the list
+    setLabResults(prev => [...newEntries, ...prev]);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Normal':
+        return 'bg-green-100 text-green-800';
+      case 'Low':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'High':
+        return 'bg-orange-100 text-orange-800';
+      case 'Critical':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  return (
   <Page 
     title="Health Dashboard" 
     subtitle="Track your progress and monitor key health metrics over time."
@@ -191,9 +277,12 @@ const Dashboard = () => (
               <div>
                 <CardTitle>Lab Results History</CardTitle>
               </div>
-              <Button variant="outline" size="sm">
-                + Add Manual Result
-              </Button>
+              <div className="flex gap-2">
+                <LabUpload onResultsAdded={handleLabResultsAdded} />
+                <Button variant="outline" size="sm">
+                  + Add Manual Result
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -209,50 +298,19 @@ const Dashboard = () => (
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  <tr>
-                    <td className="py-3 text-sm text-gray-900">Dec 15, 2024</td>
-                    <td className="py-3 text-sm text-gray-900">Total Testosterone</td>
-                    <td className="py-3 text-sm font-medium text-gray-900">485 ng/dL</td>
-                    <td className="py-3 text-sm text-gray-600">300-1000 ng/dL</td>
-                    <td className="py-3">
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                        Normal
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 text-sm text-gray-900">Dec 15, 2024</td>
-                    <td className="py-3 text-sm text-gray-900">Free Testosterone</td>
-                    <td className="py-3 text-sm font-medium text-gray-900">12.4 pg/mL</td>
-                    <td className="py-3 text-sm text-gray-600">8.7-25.1 pg/mL</td>
-                    <td className="py-3">
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                        Normal
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 text-sm text-gray-900">Dec 15, 2024</td>
-                    <td className="py-3 text-sm text-gray-900">Vitamin D</td>
-                    <td className="py-3 text-sm font-medium text-gray-900">28 ng/mL</td>
-                    <td className="py-3 text-sm text-gray-600">30-100 ng/mL</td>
-                    <td className="py-3">
-                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
-                        Low
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 text-sm text-gray-900">Nov 20, 2024</td>
-                    <td className="py-3 text-sm text-gray-900">Total Testosterone</td>
-                    <td className="py-3 text-sm font-medium text-gray-900">445 ng/dL</td>
-                    <td className="py-3 text-sm text-gray-600">300-1000 ng/dL</td>
-                    <td className="py-3">
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                        Normal
-                      </span>
-                    </td>
-                  </tr>
+                  {labResults.map((result, index) => (
+                    <tr key={index}>
+                      <td className="py-3 text-sm text-gray-900">{result.date}</td>
+                      <td className="py-3 text-sm text-gray-900">{result.test}</td>
+                      <td className="py-3 text-sm font-medium text-gray-900">{result.result}</td>
+                      <td className="py-3 text-sm text-gray-600">{result.referenceRange}</td>
+                      <td className="py-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(result.status)}`}>
+                          {result.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -261,6 +319,7 @@ const Dashboard = () => (
       </section>
     </div>
   </Page>
-);
+  );
+};
 
 export default Dashboard;
