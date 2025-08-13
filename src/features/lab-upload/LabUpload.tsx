@@ -98,6 +98,7 @@ const LabUpload = ({ onResultsAdded }: LabUploadProps) => {
                             {
                                 type: "input_image",
                                 image_url: `data:image/jpeg;base64,${base64}`,
+                                detail: "auto"
                             },
                         ],
                     },
