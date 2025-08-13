@@ -17,8 +17,9 @@
   text-align: center;
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 100;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .chat-header h2 {
@@ -53,12 +54,16 @@
 .chat-messages {
   flex: 1;
   padding: 1.5rem 2rem;
+  padding-top: 2rem;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   background: #f8fafc;
   min-height: 0; /* Allow flex item to shrink */
+  max-height: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 /* Custom scrollbar styling */

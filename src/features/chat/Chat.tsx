@@ -204,6 +204,11 @@ const Chat = () => {
         const nextStep = currentStep + 1;
         setCurrentStep(nextStep);
         addMessage(chatScript[nextStep].question, false);
+        
+        // Focus input after AI response
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 100);
       } else {
         // Assessment complete
         setIsComplete(true);
@@ -261,7 +266,7 @@ To get your detailed results and personalized product recommendations, you can v
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto bg-gray-50">
+        <div className="flex-1 overflow-y-auto bg-gray-50 mt-18">
           <div className="max-w-[720px] mx-auto px-6 py-4 space-y-4">
             {messages.map((message) => (
               <div key={message.id} className={cn(

@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import Page from '../../components/Page';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button, Input, Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui';
-import { cn } from '../../lib/utils';
 
 const Auth = () => {
   const { login, isAuthenticated } = useAuth();

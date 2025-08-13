@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import Page from '../../components/Page';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui';
-import { cn } from '../../lib/utils';
+import { Button, Card, CardContent, CardHeader, CardTitle } from '../../components/ui';
 
 const Dashboard = () => (
   <Page 
