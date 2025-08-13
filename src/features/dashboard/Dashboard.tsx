@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Page from '../../components/Page';
-import { Button, Card, CardContent, CardHeader, CardTitle } from '../../components/ui';
+import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '../../components/ui';
 import LabUpload from '../lab-upload/LabUpload';
 import { products } from '../../products';
 import type { Product } from '../../products';
+import { generateAIHealthResponse } from '../../services/openai';
 
 interface LabResult {
   test: string;
@@ -92,6 +93,18 @@ const Dashboard = () => {
 
   // Accordion state for lab results
   const [expandedAccordions, setExpandedAccordions] = useState<string[]>([]);
+
+  // Chat state
+  const [chatMessages, setChatMessages] = useState<Array<{id: string, text: string, isUser: boolean, timestamp: Date}>>([
+    {
+      id: '1',
+      text: 'Hello! I\'m your AI health assistant. I can help you understand your lab results and provide personalized health insights. What would you like to know about your health data?',
+      isUser: false,
+      timestamp: new Date()
+    }
+  ]);
+  const [chatInput, setChatInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
 
   // Calculate dynamic health metrics based on lab results
   const healthMetrics = useMemo(() => {
@@ -415,6 +428,246 @@ const Dashboard = () => {
     );
   };
 
+  // Chat functionality
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatMessages]);
+
+  const handleDiscussMetricWithAI = async (metric: HealthMetric) => {
+    const prompt = `Tell me about ${metric.title}: Current value is ${metric.value} with status ${metric.status}. Explain what ${metric.title} measures and its effects on health. ${metric.status !== 'Normal Range' && metric.status !== 'Normal' && metric.status !== 'Good' && metric.status !== 'Excellent' && metric.status !== 'Active' ? 'Since this value is not optimal, please provide a short suggestion on how to improve it.' : ''}`;
+
+    // Add the prompt as a user message
+    const userMessage = {
+      id: Date.now().toString(),
+      text: prompt,
+      isUser: true,
+      timestamp: new Date()
+    };
+
+    setChatMessages(prev => [...prev, userMessage]);
+    setIsTyping(true);
+
+    try {
+      // Get AI response
+      const aiResponseText = await generateAIHealthResponse(
+        prompt,
+        labResults,
+        chatMessages
+      );
+
+      const aiMessage = {
+        id: (Date.now() + 1).toString(),
+        text: aiResponseText,
+        isUser: false,
+        timestamp: new Date()
+      };
+
+      setChatMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      
+      // Fallback response
+      const fallbackResponse = generateMetricFallbackResponse(metric);
+      const aiMessage = {
+        id: (Date.now() + 1).toString(),
+        text: fallbackResponse,
+        isUser: false,
+        timestamp: new Date()
+      };
+
+      setChatMessages(prev => [...prev, aiMessage]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  const generateMetricFallbackResponse = (metric: HealthMetric) => {
+    const isNormal = metric.status === 'Normal Range' || metric.status === 'Normal' || metric.status === 'Good' || metric.status === 'Excellent' || metric.status === 'Active';
+    
+    switch (metric.title.toLowerCase()) {
+      case 'total cholesterol':
+        return `Total cholesterol measures the overall amount of cholesterol in your blood. It's important for cell membrane structure but elevated levels increase cardiovascular disease risk. Your current level is ${metric.value} (${metric.status}). ${!isNormal ? 'To improve: Focus on heart-healthy foods like oats, nuts, fish, and reduce saturated fats. Regular exercise helps significantly.' : 'Keep maintaining your current healthy lifestyle!'}`;
+      
+      case 'hdl cholesterol':
+        return `HDL (High-Density Lipoprotein) is "good" cholesterol that helps remove other cholesterol from arteries, protecting against heart disease. Your level is ${metric.value} (${metric.status}). ${!isNormal ? 'To improve: Increase aerobic exercise, consume omega-3 rich foods like salmon and walnuts, and maintain a healthy weight.' : 'Excellent! Your HDL levels are protective for cardiovascular health.'}`;
+      
+      case 'ldl cholesterol':
+        return `LDL (Low-Density Lipoprotein) is "bad" cholesterol that can build up in arteries, increasing heart disease risk. Your level is ${metric.value} (${metric.status}). ${!isNormal ? 'To improve: Reduce saturated and trans fats, increase soluble fiber (oats, beans), and consider plant sterols. Regular cardio exercise is very effective.' : 'Great job maintaining healthy LDL levels!'}`;
+      
+      case 'triglycerides':
+        return `Triglycerides are blood fats that provide energy. High levels increase risk of heart disease and pancreatitis. Your level is ${metric.value} (${metric.status}). ${!isNormal ? 'To improve: Limit simple carbs and sugar, reduce alcohol, increase omega-3 fatty acids, and maintain regular physical activity.' : 'Your triglyceride levels are in a healthy range.'}`;
+      
+      case 'vitamin d':
+        return `Vitamin D is crucial for bone health, immune function, and mood regulation. It helps calcium absorption and supports muscle strength. Your level is ${metric.value} (${metric.status}). ${!isNormal ? 'To improve: Increase safe sun exposure, consume fatty fish, fortified foods, or consider vitamin D3 supplements after consulting your doctor.' : 'Your vitamin D levels support optimal bone and immune health.'}`;
+      
+      case 'overall health score':
+        return `Your Overall Health Score (${metric.value}) reflects the percentage of your lab results within normal ranges. This gives a snapshot of your current health status. ${!isNormal ? 'To improve: Focus on addressing the specific abnormal results through targeted lifestyle changes and follow up with your healthcare provider.' : 'Excellent overall health! Continue your current healthy practices.'}`;
+      
+      case 'risk assessment':
+        return `Risk Assessment evaluates your potential health risks based on abnormal lab values. Your current risk level is ${metric.value}. ${!isNormal ? 'To reduce risk: Address elevated markers promptly through diet, exercise, stress management, and medical consultation as needed.' : 'Low risk indicates your biomarkers are within healthy ranges - keep up the good work!'}`;
+      
+      case 'lab tracking':
+        return `Lab Tracking monitors how consistently you monitor your health through regular testing. You have ${metric.value} showing ${metric.status} monitoring. ${!isNormal ? 'To improve: Schedule regular lab work every 3-6 months for optimal health monitoring and early detection of potential issues.' : 'Excellent health monitoring habits! Regular testing helps catch issues early.'}`;
+      
+      default:
+        return `${metric.title} shows a value of ${metric.value} with status ${metric.status}. This metric is important for tracking your overall health progress. ${!isNormal ? 'Since this value needs attention, consider discussing with your healthcare provider for personalized improvement strategies.' : 'Your levels are within a healthy range - continue your current approach!'}`;
+    }
+  };
+
+  const handleChatWithAI = async () => {
+    // Create a summary of lab results
+    const labSummary = labResults.map(result => 
+      `${result.test}: ${result.result} (${result.status}, ref: ${result.referenceRange}) - ${result.date}`
+    ).join('\n');
+
+    const prompt = `Explain these results shortly in clear simple language:\n\n${labSummary}`;
+
+    // Add the prompt as a user message
+    const userMessage = {
+      id: Date.now().toString(),
+      text: prompt,
+      isUser: true,
+      timestamp: new Date()
+    };
+
+    setChatMessages(prev => [...prev, userMessage]);
+    setIsTyping(true);
+
+    try {
+      // Get AI response
+      const aiResponseText = await generateAIHealthResponse(
+        prompt,
+        labResults,
+        chatMessages
+      );
+
+      const aiMessage = {
+        id: (Date.now() + 1).toString(),
+        text: aiResponseText,
+        isUser: false,
+        timestamp: new Date()
+      };
+
+      setChatMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      
+      // Fallback response
+      const fallbackResponse = generateFallbackResponse(prompt, labResults);
+      const aiMessage = {
+        id: (Date.now() + 1).toString(),
+        text: fallbackResponse,
+        isUser: false,
+        timestamp: new Date()
+      };
+
+      setChatMessages(prev => [...prev, aiMessage]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!chatInput.trim()) return;
+
+    const userMessage = {
+      id: Date.now().toString(),
+      text: chatInput,
+      isUser: true,
+      timestamp: new Date()
+    };
+
+    setChatMessages(prev => [...prev, userMessage]);
+    setChatInput('');
+    setIsTyping(true);
+
+    try {
+      // Use OpenAI to generate response
+      const aiResponseText = await generateAIHealthResponse(
+        chatInput,
+        labResults,
+        chatMessages
+      );
+
+      const aiMessage = {
+        id: (Date.now() + 1).toString(),
+        text: aiResponseText,
+        isUser: false,
+        timestamp: new Date()
+      };
+
+      setChatMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      
+      // Fallback to local response
+      const fallbackResponse = generateFallbackResponse(chatInput, labResults);
+      const aiMessage = {
+        id: (Date.now() + 1).toString(),
+        text: fallbackResponse,
+        isUser: false,
+        timestamp: new Date()
+      };
+
+      setChatMessages(prev => [...prev, aiMessage]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  const generateFallbackResponse = (input: string, labData: LabEntry[]) => {
+    const lowerInput = input.toLowerCase();
+    
+    // Analyze lab results to provide context
+    const highResults = labData.filter(r => r.status === 'High');
+    const lowResults = labData.filter(r => r.status === 'Low');
+    const normalResults = labData.filter(r => r.status === 'Normal');
+
+    if (lowerInput.includes('cholesterol')) {
+      const cholesterolResults = labData.filter(r => r.test.toLowerCase().includes('cholesterol'));
+      if (cholesterolResults.length > 0) {
+        const ldl = cholesterolResults.find(r => r.test.includes('LDL'));
+        if (ldl && ldl.status === 'High') {
+          return `I see your LDL cholesterol is ${ldl.result}, which is ${ldl.status.toLowerCase()}. This is above the reference range of ${ldl.referenceRange}. I recommend focusing on heart-healthy foods like oats, nuts, and fish, while reducing saturated fats. Regular exercise can also help improve these levels.`;
+        }
+        return `Your cholesterol levels show: ${cholesterolResults.map(r => `${r.test}: ${r.result} (${r.status})`).join(', ')}. Overall, this is manageable with lifestyle adjustments.`;
+      }
+    }
+
+    if (lowerInput.includes('vitamin d')) {
+      const vitaminD = labData.find(r => r.test.toLowerCase().includes('vitamin d'));
+      if (vitaminD) {
+        return `Your Vitamin D level is ${vitaminD.result}, which is ${vitaminD.status.toLowerCase()}. ${vitaminD.status === 'Low' ? 'Consider increasing sun exposure and vitamin D3 supplementation.' : 'Your levels are good - keep maintaining your current habits.'}`;
+      }
+    }
+
+    if (lowerInput.includes('results') || lowerInput.includes('summary')) {
+      return `Based on your latest labs from ${labData[0]?.date}, you have ${normalResults.length} normal results${highResults.length > 0 ? `, ${highResults.length} elevated marker${highResults.length > 1 ? 's' : ''}` : ''}${lowResults.length > 0 ? `, and ${lowResults.length} low marker${lowResults.length > 1 ? 's' : ''}` : ''}. ${highResults.length > 0 ? 'Focus on addressing the elevated markers through lifestyle changes.' : 'Great job maintaining healthy levels!'}`;
+    }
+
+    if (lowerInput.includes('recommend') || lowerInput.includes('advice')) {
+      if (highResults.length > 0) {
+        return `Given your elevated ${highResults.map(r => r.test).join(' and ')}, I recommend: 1) Dietary modifications focusing on heart-healthy foods, 2) Regular physical activity, 3) Stress management techniques, and 4) Consider consulting with your healthcare provider for a comprehensive plan.`;
+      }
+      return `Your lab results look good overall! Continue your current healthy habits. Regular monitoring, balanced nutrition, adequate sleep, and staying active are key to maintaining optimal health.`;
+    }
+
+    // Default responses
+    const responses = [
+      `I can help you understand your lab results better. You currently have ${normalResults.length} normal results and ${highResults.length + lowResults.length} that need attention. What specific aspect would you like to discuss?`,
+      `Based on your health data, I can provide insights about your cholesterol, vitamin levels, and overall health trends. What questions do you have?`,
+      `I'm here to help you make sense of your lab results and provide actionable health advice. Feel free to ask about any specific test or health concern.`
+    ];
+    
+    return responses[Math.floor(Math.random() * responses.length)];
+  };
+
   const handleLabResultsAdded = (processedResults: ProcessedResults) => {
     // Convert the processed results to our lab entry format
     const newEntries: LabEntry[] = processedResults.results.map(result => ({
@@ -449,8 +702,10 @@ const Dashboard = () => {
     title="Health Dashboard" 
     subtitle="Track your progress and monitor key health metrics over time."
   >
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Health Summary Section */}
+    <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+        {/* Main Content - Left Side */}
+        <div className="xl:col-span-3 space-y-8">{/* Health Summary Section */}
       <section className="mb-8">
         <Card className={`border-l-4 ${
           healthSummary.alertLevel === 'good' ? 'border-l-green-500' :
@@ -482,8 +737,8 @@ const Dashboard = () => {
           <CardContent>
             <p className="text-gray-800 mb-4">{healthSummary.summaryText}</p>
             <div className="flex flex-wrap gap-2">
-              <Button size="sm" variant="outline" asChild>
-                <Link to="/chat">Chat with AI about your results</Link>
+              <Button size="sm" variant="outline" onClick={handleChatWithAI}>
+                Chat with AI about your results
               </Button>
               {healthSummary.alertLevel !== 'good' && (
                 <>
@@ -594,23 +849,33 @@ const Dashboard = () => {
                   ))}
                 </div>
 
-                {/* Action Button */}
-                {metric.actionButton && (
+                {/* Action Buttons */}
+                <div className="space-y-2">
+                  {metric.actionButton && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full text-xs h-7 sm:h-8"
+                      asChild={metric.actionButton.action !== 'upload'}
+                    >
+                      {metric.actionButton.action === 'upload' ? (
+                        <span className="cursor-pointer">{metric.actionButton.text}</span>
+                      ) : (
+                        <Link to={metric.actionButton.action}>
+                          {metric.actionButton.text}
+                        </Link>
+                      )}
+                    </Button>
+                  )}
                   <Button 
-                    variant="outline" 
+                    variant="ghost" 
                     size="sm" 
-                    className="w-full text-xs h-7 sm:h-8"
-                    asChild={metric.actionButton.action !== 'upload'}
+                    className="w-full text-xs h-7 sm:h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    onClick={() => handleDiscussMetricWithAI(metric)}
                   >
-                    {metric.actionButton.action === 'upload' ? (
-                      <span className="cursor-pointer">{metric.actionButton.text}</span>
-                    ) : (
-                      <Link to={metric.actionButton.action}>
-                        {metric.actionButton.text}
-                      </Link>
-                    )}
+                    Discuss with AI
                   </Button>
-                )}
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -702,6 +967,77 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </section>
+        </div>
+
+        {/* Chat Panel - Right Side */}
+        <div className="xl:col-span-1">
+          <div className="fixed bottom-0 right-4 xl:fixed xl:bottom-0 xl:right-4 xl:w-80">
+            <Card className="w-80 xl:w-80 h-[700px] flex flex-col shadow-lg">
+              <CardHeader className="flex-shrink-0 border-b">
+                <CardTitle className="text-lg">AI Health Assistant</CardTitle>
+                <p className="text-sm text-gray-600">Get instant insights about your health data</p>
+              </CardHeader>
+            
+            {/* Chat Messages */}
+            <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+              {chatMessages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
+                      message.isUser
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-900'
+                    }`}
+                  >
+                    {message.text}
+                  </div>
+                </div>
+              ))}
+              {isTyping && (
+                <div className="flex justify-start">
+                  <div className="bg-gray-100 text-gray-900 rounded-lg px-3 py-2 text-sm">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
+            </CardContent>
+
+            {/* Chat Input */}
+            <div className="flex-shrink-0 border-t p-4">
+              <div className="flex space-x-2">
+                <Input
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Ask about your health results..."
+                  className="flex-1"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                />
+                <Button 
+                  onClick={handleSendMessage}
+                  disabled={!chatInput.trim() || isTyping}
+                  size="sm"
+                >
+                  Send
+                </Button>
+              </div>
+            </div>
+            </Card>
+          </div>
+        </div>
+      </div>
     </div>
   </Page>
   );
