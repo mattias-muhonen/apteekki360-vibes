@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import { Button, Card, CardContent, CardHeader, CardTitle, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui';
 import { Upload, Image as ImageIcon, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import OpenAI from 'openai';
+import { useAuth } from '../../contexts/AuthContext';
+import UserDataService from '../../services/userDataService';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -28,6 +30,8 @@ interface LabUploadProps {
 }
 
 const LabUpload = ({ onResultsAdded }: LabUploadProps) => {
+    const { user } = useAuth();
+    const userDataService = UserDataService.getInstance();
     const [isOpen, setIsOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -130,7 +134,7 @@ const LabUpload = ({ onResultsAdded }: LabUploadProps) => {
                     }),
                     confidence: 0.95 // Default confidence since it's not provided
                 };
-
+                console.log('PROCESSES', transformedResults)
                 setProcessedResults(transformedResults);
             } catch (parseError) {
                 console.error('Parse error:', parseError);
@@ -147,9 +151,21 @@ const LabUpload = ({ onResultsAdded }: LabUploadProps) => {
     };
 
     const handleSaveResults = () => {
-        if (!processedResults) return;
+        if (!processedResults || !user?.id) return;
         
-        // Call the callback to add results to the dashboard
+        // Transform processed results to lab entries format
+        const labEntries = processedResults.results.map(result => ({
+            date: processedResults.date,
+            test: result.test,
+            result: result.result,
+            referenceRange: result.referenceRange,
+            status: result.status
+        }));
+        
+        // Add to user data service
+        userDataService.addLabResults(user.id, labEntries);
+        
+        // Call the callback to update the dashboard
         onResultsAdded?.(processedResults);
         
         console.log('Saving results:', processedResults);
