@@ -181,10 +181,8 @@ const Dashboard = () => {
         const getActionButton = (testName: string, status: string) => {
           if (status === 'High' || status === 'Low' || status === 'Critical') {
             switch (testName.toLowerCase()) {
-              case 'total cholesterol':
               case 'ldl cholesterol':
-              case 'triglycerides':
-                return { text: 'Heart Health Tips', action: '/catalog?category=heart' };
+                return undefined; // No button for LDL Cholesterol
               case 'vitamin d':
                 return { text: 'Shop Vitamin D', action: '/catalog?search=vitamin+d' };
               default:
@@ -748,14 +746,9 @@ const Dashboard = () => {
                 Chat with AI about your results
               </Button>
               {healthSummary.alertLevel !== 'good' && (
-                <>
-                  <Button size="sm" asChild>
-                    <Link to="/booking">Book Consultation</Link>
-                  </Button>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to="/catalog">View Supplements</Link>
-                  </Button>
-                </>
+                <Button size="sm" asChild>
+                  <Link to="/booking">Book Consultation</Link>
+                </Button>
               )}
             </div>
           </CardContent>
@@ -801,6 +794,11 @@ const Dashboard = () => {
               </Card>
             ))}
           </div>
+          <div className="mt-6">
+            <Button variant="outline" asChild>
+              <Link to="/catalog">More products</Link>
+            </Button>
+          </div>
         </section>
       )}
       {/* Health Metrics Overview */}
@@ -811,7 +809,7 @@ const Dashboard = () => {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           {healthMetrics.map((metric, index) => (
-            <Card key={index} className="h-fit">
+            <Card key={index} className="h-full flex flex-col">
               <CardHeader className="pb-2 px-3 pt-3 sm:px-4 sm:pt-4">
                 <div className="flex justify-between items-start">
                   <CardTitle className="text-xs sm:text-sm font-medium leading-tight">{metric.title}</CardTitle>
@@ -824,7 +822,7 @@ const Dashboard = () => {
                   </span>
                 </div>
               </CardHeader>
-              <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
+              <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4 flex-1 flex flex-col">
                 <div className="text-lg sm:text-xl lg:text-2xl font-bold mb-1">{metric.value}</div>
                 <div className={`text-xs sm:text-sm mb-2 ${
                   metric.color === 'green' ? 'text-green-600' :
@@ -836,7 +834,7 @@ const Dashboard = () => {
                 </div>
                 
                 {/* Actionable Insight */}
-                <div className="text-xs text-gray-600 mb-3 leading-relaxed">
+                <div className="text-xs text-gray-600 mb-3 leading-relaxed flex-1">
                   {metric.actionableInsight}
                 </div>
 
@@ -857,7 +855,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="space-y-2">
+                <div className="space-y-2 mt-auto">
                   {metric.actionButton && (
                     <Button 
                       variant="outline" 
@@ -875,9 +873,9 @@ const Dashboard = () => {
                     </Button>
                   )}
                   <Button 
-                    variant="ghost" 
+                    variant="outline" 
                     size="sm" 
-                    className="w-full text-xs h-7 sm:h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    className="w-full text-xs h-7 sm:h-8 text-blue-600 border-blue-600 hover:bg-blue-600 hover:text-white"
                     onClick={() => handleDiscussMetricWithAI(metric)}
                   >
                     Discuss with AI
