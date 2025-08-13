@@ -7,18 +7,8 @@ interface LabEntry {
   id?: string; // Add unique identifier for deletion
 }
 
-interface ChatMessage {
-  id: string;
-  text: string;
-  isUser: boolean;
-  timestamp: Date;
-}
-
-interface UserDashboardData {
+interface UserLabData {
   labResults: LabEntry[];
-  chatMessages: ChatMessage[];
-  expandedAccordions: string[];
-  isChatMinimized: boolean;
   lastUpdated: string;
 }
 
@@ -33,7 +23,7 @@ class UserDataService {
   }
 
   private getStorageKey(userId: string): string {
-    return `health360_dashboard_${userId}`;
+    return `health360_labs_${userId}`;
   }
 
   private generateId(): string {
@@ -317,37 +307,29 @@ class UserDataService {
     ];
   }
 
-  private getDefaultData(): UserDashboardData {
+  private getDefaultData(): UserLabData {
     return {
       labResults: this.getDefaultLabResults(),
-      chatMessages: [],
-      expandedAccordions: [],
-      isChatMinimized: false,
       lastUpdated: new Date().toISOString()
     };
   }
 
-  getUserData(userId: string): UserDashboardData {
+  getUserData(userId: string): UserLabData {
     try {
       const stored = localStorage.getItem(this.getStorageKey(userId));
       if (stored) {
         const data = JSON.parse(stored);
-        // Convert timestamp strings back to Date objects for chat messages
-        data.chatMessages = data.chatMessages.map((msg: any) => ({
-          ...msg,
-          timestamp: new Date(msg.timestamp)
-        }));
         return data;
       }
     } catch (error) {
-      console.error('Error loading user data:', error);
+      console.error('Error loading user lab data:', error);
     }
     
     // Return default data for new users
     return this.getDefaultData();
   }
 
-  saveUserData(userId: string, data: UserDashboardData): void {
+  saveUserData(userId: string, data: UserLabData): void {
     try {
       const dataToSave = {
         ...data,
@@ -355,7 +337,7 @@ class UserDataService {
       };
       localStorage.setItem(this.getStorageKey(userId), JSON.stringify(dataToSave));
     } catch (error) {
-      console.error('Error saving user data:', error);
+      console.error('Error saving user lab data:', error);
     }
   }
 
@@ -371,7 +353,7 @@ class UserDataService {
 
   deleteLabResult(userId: string, resultId: string): void {
     const data = this.getUserData(userId);
-    data.labResults = data.labResults.filter(result => result.id !== resultId);
+    data.labResults = data.labResults.filter((result: LabEntry) => result.id !== resultId);
     this.saveUserData(userId, data);
   }
 
@@ -381,34 +363,10 @@ class UserDataService {
     this.saveUserData(userId, data);
   }
 
-  addChatMessage(userId: string, message: ChatMessage): void {
-    const data = this.getUserData(userId);
-    data.chatMessages = [...data.chatMessages, message];
-    this.saveUserData(userId, data);
-  }
-
-  updateChatMessages(userId: string, messages: ChatMessage[]): void {
-    const data = this.getUserData(userId);
-    data.chatMessages = messages;
-    this.saveUserData(userId, data);
-  }
-
-  updateExpandedAccordions(userId: string, expandedAccordions: string[]): void {
-    const data = this.getUserData(userId);
-    data.expandedAccordions = expandedAccordions;
-    this.saveUserData(userId, data);
-  }
-
-  updateChatMinimized(userId: string, isChatMinimized: boolean): void {
-    const data = this.getUserData(userId);
-    data.isChatMinimized = isChatMinimized;
-    this.saveUserData(userId, data);
-  }
-
   clearUserData(userId: string): void {
     localStorage.removeItem(this.getStorageKey(userId));
   }
 }
 
 export default UserDataService;
-export type { LabEntry, ChatMessage, UserDashboardData };
+export type { LabEntry, UserLabData };

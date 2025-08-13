@@ -40,6 +40,7 @@ const Chat = () => {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const initializedRef = useRef(false);
 
   const chatScript = [
     {
@@ -83,28 +84,11 @@ const Chat = () => {
   }, [messages]);
 
   useEffect(() => {
-    // Start with a simple welcome message, let AI generate the first question
-    addMessage("Hello! I'm your AI health assistant. I'm here to help you get personalized health insights. Let me start by asking you a few questions.", false);
-    
-    // Generate the first AI question
-    const generateFirstQuestion = async () => {
-      setIsTyping(true);
-      try {
-        const firstQuestion = await generateAIHealthResponse(
-          chatScript[0].systemPrompt + "\n\nGenerate the first question about the user's primary health concern. Keep it conversational and empathetic.",
-          [],
-          []
-        );
-        setIsTyping(false);
-        addMessage(firstQuestion, false);
-      } catch (error) {
-        setIsTyping(false);
-        // Fallback to the default question
-        addMessage(chatScript[0].question, false);
-      }
-    };
-    
-    generateFirstQuestion();
+    // Only add initial message once, even if useEffect runs multiple times (React Strict Mode)
+    if (!initializedRef.current) {
+      initializedRef.current = true;
+      addMessage(chatScript[0].question, false);
+    }
   }, []);
 
   const addMessage = (text: string, isUser: boolean) => {

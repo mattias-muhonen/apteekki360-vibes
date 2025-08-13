@@ -7,8 +7,8 @@ import { products } from '../../products';
 import type { Product } from '../../products';
 import { generateAIHealthResponse } from '../../services/openai';
 import { useAuth } from '../../contexts/AuthContext';
-import UserDataService, { type LabEntry, type ChatMessage } from '../../services/userDataService';
-import { Trash2, MessageCircle, Send, X, ChevronDown, ChevronUp, Minus, Plus, Loader2, TrendingUp, TrendingDown, Activity, Star, Zap, Moon, Dumbbell } from 'lucide-react';
+import UserDataService from '../../services/userDataService';
+import { Trash2 } from 'lucide-react';
 
 interface LabResult {
   test: string;
@@ -30,6 +30,7 @@ interface LabEntry {
   result: string;
   referenceRange: string;
   status: 'Normal' | 'Low' | 'High' | 'Critical';
+  id?: string; // Add unique identifier for deletion
 }
 
 interface HealthMetric {
@@ -48,157 +49,11 @@ interface HealthMetric {
 }
 
 const Dashboard = () => {
-  // Initial lab results data
-  const [labResults, setLabResults] = useState<LabEntry[]>([
-    {
-        date: "Dec 15, 2024",
-        test: "Hemoglobin",
-        result: "15.1 g/dL",
-        referenceRange: "13.5 – 17.5 g/dL",
-        status: "Normal"
-    },
-    {
-        date: "Dec 15, 2024",
-        test: "Hematocrit",
-        result: "44 %",
-        referenceRange: "41 – 53 %",
-        status: "Normal"
-    },
-    {
-        date: "Dec 15, 2024",
-        test: "WBC (White Blood Cells)",
-        result: "6.4 ×10⁹/L",
-        referenceRange: "4.0 – 11.0 ×10⁹/L",
-        status: "Normal"
-    },
-    {
-        date: "Dec 15, 2024",
-        test: "Platelets",
-        result: "240 ×10⁹/L",
-        referenceRange: "150 – 450 ×10⁹/L",
-        status: "Normal"
-    },
-    {
-        date: "Dec 15, 2024",
-        test: "Sodium",
-        result: "140 mmol/L",
-        referenceRange: "135 – 145 mmol/L",
-        status: "Normal"
-    },
-    {
-        date: "Dec 15, 2024",
-        test: "Potassium",
-        result: "4.4 mmol/L",
-        referenceRange: "3.5 – 5.0 mmol/L",
-        status: "Normal"
-    },
-    {
-        date: "Dec 15, 2024",
-        test: "Creatinine",
-        result: "0.96 mg/dL",
-        referenceRange: "0.74 – 1.35 mg/dL",
-        status: "Normal"
-    },
-    {
-        date: "Dec 15, 2024",
-        test: "eGFR",
-        result: "95 mL/min/1.73m²",
-        referenceRange: "> 90 mL/min/1.73m²",
-        status: "Normal"
-    },
-    {
-        date: "Dec 15, 2024",
-        test: "Glucose (fasting)",
-        result: "92 mg/dL",
-        referenceRange: "70 – 99 mg/dL",
-        status: "Normal"
-    },
-    {
-        date: "Dec 15, 2024",
-        test: "Total Cholesterol",
-        result: "182 mg/dL",
-        referenceRange: "< 200 mg/dL",
-        status: "Normal"
-    },
-    {
-        date: "Dec 15, 2024",
-        test: "LDL Cholesterol",
-        result: "110 mg/dL",
-        referenceRange: "< 130 mg/dL",
-        status: "Normal"
-    },
-    {
-        date: "Dec 15, 2024",
-        test: "HDL Cholesterol",
-        result: "52 mg/dL",
-        referenceRange: "> 40 mg/dL",
-        status: "Normal"
-    },
-    {
-        date: "Dec 15, 2024",
-        test: "Triglycerides",
-        result: "115 mg/dL",
-        referenceRange: "< 150 mg/dL",
-        status: "Normal"
-    },
-    {
-        date: "Dec 15, 2024",
-        test: "ALT",
-        result: "22 U/L",
-        referenceRange: "7 – 56 U/L",
-        status: "Normal"
-    },
-    {
-        date: "Dec 15, 2024",
-        test: "AST",
-        result: "25 U/L",
-        referenceRange: "10 – 40 U/L",
-        status: "Normal"
-    },
-    {
-        date: "Dec 15, 2024",
-        test: "ALP",
-        result: "80 U/L",
-        referenceRange: "44 – 147 U/L",
-        status: "Normal"
-    },
-    {
-        date: "Dec 15, 2024",
-        test: "Bilirubin (Total)",
-        result: "0.8 mg/dL",
-        referenceRange: "0.1 – 1.2 mg/dL",
-        status: "Normal"
-    },
-    // Add some previous results for trend analysis
-    {
-        date: "Nov 20, 2024",
-        test: "Total Cholesterol",
-        result: "195 mg/dL",
-        referenceRange: "< 200 mg/dL",
-        status: "Normal"
-    },
-    {
-        date: "Nov 20, 2024",
-        test: "LDL Cholesterol",
-        result: "115 mg/dL",
-        referenceRange: "< 130 mg/dL",
-        status: "Normal"
-    },
-    {
-        date: "Nov 20, 2024",
-        test: "HDL Cholesterol",
-        result: "48 mg/dL",
-        referenceRange: "> 40 mg/dL",
-        status: "Normal"
-    },
-    {
-        date: "Nov 20, 2024",
-        test: "Triglycerides",
-        result: "125 mg/dL",
-        referenceRange: "< 150 mg/dL",
-        status: "Normal"
-    }
-]);
+  const { user } = useAuth();
+  const userDataService = UserDataService.getInstance();
+  
+  // Lab results data from userDataService
+  const [labResults, setLabResults] = useState<LabEntry[]>([]);
 
   // Accordion state for lab results
   const [expandedAccordions, setExpandedAccordions] = useState<string[]>([]);
@@ -215,6 +70,23 @@ const Dashboard = () => {
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isChatMinimized, setIsChatMinimized] = useState(false);
+
+  // Load user lab results from userDataService
+  useEffect(() => {
+    if (user?.id) {
+      const userData = userDataService.getUserData(user.id);
+      setLabResults(userData.labResults);
+    }
+  }, [user?.id, userDataService]);
+
+  // Function to handle lab result deletion
+  const handleDeleteLabResult = (resultId: string) => {
+    if (user?.id && resultId) {
+      userDataService.deleteLabResult(user.id, resultId);
+      const updatedData = userDataService.getUserData(user.id);
+      setLabResults(updatedData.labResults);
+    }
+  };
 
   // Calculate dynamic health metrics based on lab results
   const healthMetrics = useMemo(() => {
@@ -767,8 +639,10 @@ const Dashboard = () => {
   };
 
   const handleLabResultsAdded = (processedResults: ProcessedResults) => {
-    // Convert the processed results to our lab entry format
-    const newEntries: LabEntry[] = processedResults.results.map(result => ({
+    if (!user?.id) return;
+
+    // Convert the processed results to our lab entry format (without IDs, userDataService will add them)
+    const newEntries: Omit<LabEntry, 'id'>[] = processedResults.results.map(result => ({
       date: processedResults.date,
       test: result.test,
       result: result.result,
@@ -776,8 +650,12 @@ const Dashboard = () => {
       status: result.status
     }));
 
-    // Add new results to the top of the list
-    setLabResults(prev => [...newEntries, ...prev]);
+    // Add new results using userDataService
+    userDataService.addLabResults(user.id, newEntries);
+    
+    // Refresh the lab results from userDataService
+    const updatedData = userDataService.getUserData(user.id);
+    setLabResults(updatedData.labResults);
   };
 
   const getStatusColor = (status: string) => {
@@ -1247,11 +1125,12 @@ const Dashboard = () => {
                                     <th className="text-left py-3 text-sm font-semibold text-gray-900">Result</th>
                                     <th className="text-left py-3 text-sm font-semibold text-gray-900">Reference Range</th>
                                     <th className="text-left py-3 text-sm font-semibold text-gray-900">Status</th>
+                                    <th className="text-left py-3 text-sm font-semibold text-gray-900">Actions</th>
                                   </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
                                   {dateGroup.results.map((result, index) => (
-                                    <tr key={index} className="hover:bg-gray-50">
+                                    <tr key={result.id || index} className="hover:bg-gray-50">
                                       <td className="py-3 text-sm text-gray-900 font-medium">{result.test}</td>
                                       <td className="py-3 text-sm font-semibold text-gray-900">{result.result}</td>
                                       <td className="py-3 text-sm text-gray-600">{result.referenceRange}</td>
@@ -1259,6 +1138,18 @@ const Dashboard = () => {
                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(result.status)}`}>
                                           {result.status}
                                         </span>
+                                      </td>
+                                      <td className="py-3">
+                                        {result.id && (
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleDeleteLabResult(result.id!)}
+                                            className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                                          >
+                                            <Trash2 className="h-4 w-4" />
+                                          </Button>
+                                        )}
                                       </td>
                                     </tr>
                                   ))}
