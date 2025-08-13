@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Page from '../../components/Page';
 import { Button, Input } from '../../components/ui';
 import { cn } from '../../lib/utils';
+import { generateAIHealthResponse } from '../../services/openai';
 
 interface Message {
   id: string;
@@ -42,46 +43,34 @@ const Chat = () => {
 
   const chatScript = [
     {
+      id: 1,
       question: "Hello! I'm your AI health assistant. I'm here to help you understand your health concerns and provide personalized recommendations. What brings you here today? Are you experiencing fatigue, low energy, concerns about testosterone, sleep issues, or something else?",
       field: 'primaryConcern',
-      keywords: {
-        fatigue: ['tired', 'fatigue', 'exhausted', 'energy', 'sleepy'],
-        testosterone: ['testosterone', 'low t', 'libido', 'sex drive', 'muscle'],
-        sleep: ['sleep', 'insomnia', 'rest', 'sleeping'],
-        stress: ['stress', 'anxiety', 'overwhelmed', 'pressure']
-      }
+      systemPrompt: "You are a health assessment AI. Ask about the user's primary health concern. Keep responses concise and empathetic. Guide them to be specific about their main health issue."
     },
     {
+      id: 2,
       question: "Thank you for sharing that. To provide more accurate recommendations, could you tell me your age? This helps me understand your health context better.",
       field: 'age',
-      keywords: {}
+      systemPrompt: "Ask for the user's age for health context. Be respectful and explain why age is important for health recommendations."
     },
     {
+      id: 3,
       question: "How would you describe your sleep quality lately? Are you getting restful sleep, having trouble falling asleep, waking up frequently, or feeling tired despite sleeping?",
       field: 'sleepQuality',
-      keywords: {
-        poor: ['bad', 'poor', 'terrible', 'awful', 'trouble'],
-        fair: ['okay', 'fair', 'average', 'sometimes'],
-        good: ['good', 'well', 'fine', 'restful']
-      }
+      systemPrompt: "Assess sleep quality in detail. Ask about sleep duration, quality, and any sleep disturbances. Sleep is crucial for health analysis."
     },
     {
+      id: 4,
       question: "On a scale from very low to very high, how would you rate your current energy levels throughout the day? Do you feel energetic, moderately tired, or completely drained?",
       field: 'energyLevel',
-      keywords: {
-        low: ['low', 'tired', 'drained', 'exhausted', 'weak'],
-        moderate: ['okay', 'moderate', 'fair', 'average'],
-        high: ['high', 'good', 'energetic', 'strong']
-      }
+      systemPrompt: "Evaluate energy levels throughout the day. Ask about patterns, when they feel most/least energetic, and how this affects daily activities."
     },
     {
+      id: 5,
       question: "How would you describe your current stress levels? Are you feeling overwhelmed, managing well, or somewhere in between? Stress can significantly impact your overall health.",
       field: 'stressLevel',
-      keywords: {
-        high: ['high', 'overwhelmed', 'stressed', 'anxious', 'pressure'],
-        moderate: ['moderate', 'manageable', 'some', 'occasional'],
-        low: ['low', 'calm', 'relaxed', 'minimal']
-      }
+      systemPrompt: "Assess stress levels and sources. Ask about work-life balance, stress management techniques, and how stress affects their health symptoms."
     }
   ];
 
@@ -94,8 +83,28 @@ const Chat = () => {
   }, [messages]);
 
   useEffect(() => {
-    // Start with the first question
-    addMessage(chatScript[0].question, false);
+    // Start with a simple welcome message, let AI generate the first question
+    addMessage("Hello! I'm your AI health assistant. I'm here to help you get personalized health insights. Let me start by asking you a few questions.", false);
+    
+    // Generate the first AI question
+    const generateFirstQuestion = async () => {
+      setIsTyping(true);
+      try {
+        const firstQuestion = await generateAIHealthResponse(
+          chatScript[0].systemPrompt + "\n\nGenerate the first question about the user's primary health concern. Keep it conversational and empathetic.",
+          [],
+          []
+        );
+        setIsTyping(false);
+        addMessage(firstQuestion, false);
+      } catch (error) {
+        setIsTyping(false);
+        // Fallback to the default question
+        addMessage(chatScript[0].question, false);
+      }
+    };
+    
+    generateFirstQuestion();
   }, []);
 
   const addMessage = (text: string, isUser: boolean) => {
@@ -108,7 +117,7 @@ const Chat = () => {
     setMessages(prev => [...prev, newMessage]);
   };
 
-  const analyzeResponse = (response: string, step: number) => {
+  const analyzeResponse = async (response: string, step: number) => {
     const currentQuestion = chatScript[step];
     let analyzedValue = response;
 
@@ -122,18 +131,7 @@ const Chat = () => {
       }
     }
 
-    // Keyword analysis for other fields
-    for (const [category, keywords] of Object.entries(currentQuestion.keywords)) {
-      for (const keyword of keywords) {
-        if (response.toLowerCase().includes(keyword)) {
-          analyzedValue = category;
-          break;
-        }
-      }
-      if (analyzedValue !== response) break;
-    }
-
-    // Update health profile
+    // For other fields, store the raw response - OpenAI will handle the analysis
     setHealthProfile(prev => ({
       ...prev,
       [currentQuestion.field]: analyzedValue
@@ -142,45 +140,93 @@ const Chat = () => {
     return analyzedValue;
   };
 
-  const generateSummary = () => {
-    const { primaryConcern, age, sleepQuality, energyLevel, stressLevel } = healthProfile;
-    
-    let riskLevel = 'Low';
-    let recommendations = [];
-    
-    // Determine risk level based on responses
-    if (energyLevel.includes('low') || sleepQuality.includes('poor') || stressLevel.includes('high')) {
-      riskLevel = 'Moderate to High';
-      recommendations = [
-        'Comprehensive testosterone panel testing',
-        'Sleep quality assessment',
-        'Stress management consultation',
-        'Targeted supplement recommendations'
-      ];
-    } else {
-      recommendations = [
-        'Basic health monitoring',
-        'Preventive supplement support',
-        'Lifestyle optimization guidance'
-      ];
+  const generateSummary = async () => {
+    // Create a comprehensive prompt for OpenAI analysis
+    const analysisPrompt = `
+You must always make the analysis to be either low testosterone or general health and wellness. Refer to the previous answers to justify your decision and give a one sentence result.
+`;
+
+    try {
+      // Use OpenAI to generate the health analysis
+      const aiAnalysis = await generateAIHealthResponse(
+        analysisPrompt,
+        [], // No lab results for this assessment
+        messages
+      );
+
+      // Parse the AI response for structured data
+      const riskLevel = aiAnalysis.includes('High risk') ? 'High' : 
+                       aiAnalysis.includes('Moderate') ? 'Moderate' : 'Low';
+
+      return {
+        riskLevel,
+        aiAnalysis
+      };
+    } catch (error) {
+      console.error('Error generating AI analysis:', error);
+      
+      // Fallback to basic analysis
+      const { energyLevel, sleepQuality, stressLevel } = healthProfile;
+      let riskLevel = 'Low';
+      let recommendations = [];
+      
+      if (energyLevel.toLowerCase().includes('low') || 
+          sleepQuality.toLowerCase().includes('poor') || 
+          stressLevel.toLowerCase().includes('high')) {
+        riskLevel = 'Moderate to High';
+        recommendations = [
+          'Comprehensive health panel testing',
+          'Sleep quality assessment',
+          'Stress management consultation',
+          'Targeted supplement recommendations'
+        ];
+      } else {
+        recommendations = [
+          'Basic health monitoring',
+          'Preventive supplement support',
+          'Lifestyle optimization guidance'
+        ];
+      }
+
+      return {
+        riskLevel,
+        aiAnalysis: `Based on your assessment, your risk level is ${riskLevel}. Recommended next steps: ${recommendations.join(', ')}`
+      };
     }
-
-    return {
-      riskLevel,
-      recommendations,
-      summary: `Based on your responses, you're a ${age}-year-old dealing with ${primaryConcern}. Your current energy levels are ${energyLevel}, sleep quality is ${sleepQuality}, and stress levels are ${stressLevel}.`
-    };
   };
 
-  const simulateTyping = (callback: () => void, delay = 1500) => {
-    setIsTyping(true);
-    setTimeout(() => {
-      setIsTyping(false);
-      callback();
-    }, delay);
+  const generateNextQuestion = async (userResponse: string, step: number) => {
+    const currentQuestion = chatScript[step];
+    const nextStep = step + 1;
+    
+    if (nextStep < chatScript.length) {
+      // Use OpenAI to generate a contextual follow-up question
+      const contextPrompt = `
+${currentQuestion.systemPrompt}
+
+User's previous response: "${userResponse}"
+Next topic: ${chatScript[nextStep].field}
+Base question: "${chatScript[nextStep].question}"
+
+Generate a natural follow-up question that acknowledges their previous response and smoothly transitions to asking about ${chatScript[nextStep].field}. Keep it conversational and empathetic.
+`;
+
+      try {
+        const aiQuestion = await generateAIHealthResponse(
+          contextPrompt,
+          [],
+          messages
+        );
+        return aiQuestion;
+      } catch (error) {
+        console.error('Error generating AI question:', error);
+        return chatScript[nextStep].question; // Fallback to default question
+      }
+    }
+    return null;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
 
@@ -188,8 +234,9 @@ const Chat = () => {
     addMessage(input, true);
     
     // Analyze the response
-    analyzeResponse(input, currentStep);
+    await analyzeResponse(input, currentStep);
     
+    const userResponse = input;
     setInput('');
 
     // Focus the input field after sending message
@@ -198,43 +245,54 @@ const Chat = () => {
     }, 100);
 
     // Simulate AI typing and response
-    simulateTyping(() => {
+    setIsTyping(true);
+    
+    try {
       if (currentStep < chatScript.length - 1) {
-        // Move to next question
-        const nextStep = currentStep + 1;
-        setCurrentStep(nextStep);
-        addMessage(chatScript[nextStep].question, false);
+        // Generate next question using AI
+        const nextQuestion = await generateNextQuestion(userResponse, currentStep);
         
-        // Focus input after AI response
-        setTimeout(() => {
-          inputRef.current?.focus();
-        }, 100);
+        setIsTyping(false);
+        
+        if (nextQuestion) {
+          const nextStep = currentStep + 1;
+          setCurrentStep(nextStep);
+          addMessage(nextQuestion, false);
+          
+          // Focus input after AI response
+          setTimeout(() => {
+            inputRef.current?.focus();
+          }, 100);
+        }
       } else {
-        // Assessment complete
+        // Assessment complete - generate AI summary
+        const summary = await generateSummary();
         setIsComplete(true);
-        const summary = generateSummary();
+        setIsTyping(false);
         
         const summaryMessage = `
-Thank you for completing the assessment! Here's your health analysis:
+Thank you for completing the assessment! Here's your AI-generated health analysis:
 
-${summary.summary}
-
-**Risk Assessment**: ${summary.riskLevel} risk for hormonal imbalances and energy issues.
-
-**Recommended Next Steps**:
-${summary.recommendations.map(rec => `• ${rec}`).join('\n')}
+${summary.aiAnalysis}
 
 To get your detailed results and personalized product recommendations, you can view them as a guest or create a free account to save your progress and track improvements over time.
         `;
         
         addMessage(summaryMessage, false);
       }
-    });
+    } catch (error) {
+      setIsTyping(false);
+      console.error('Error in chat flow:', error);
+      addMessage("I apologize, but I'm having trouble processing your response. Please try again.", false);
+    }
   };
 
   const suggestedResponses = () => {
     if (currentStep === 0) {
       return ['I feel tired all the time', 'Low energy and motivation', 'Sleep problems', 'Stress and anxiety'];
+    }
+    if (currentStep === 1) {
+      return ['25 years old', '35 years old', '45 years old', 'Over 50'];
     }
     if (currentStep === 2) {
       return ['Poor sleep quality', 'Wake up tired', 'Sleep well', 'Trouble falling asleep'];

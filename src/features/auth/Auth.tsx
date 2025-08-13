@@ -9,7 +9,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const [mode, setMode] = useState<'login' | 'register' | 'otp'>('login');
   const [email, setEmail] = useState('demo@health360.com');
-  const [password, setPassword] = useState('demo123');
+  const [password, setPassword] = useState('sdfasfdkahflaksjhdfaksjdfhalskjdhfalskjfhaslkfjhaslkfdhjalskdfjhalskdfhjalskdjfh');
   const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');

@@ -15,22 +15,48 @@ const Landing = () => (
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-purple-100 leading-relaxed">
               Get personalized health assessments, expert recommendations, and track your progress 
-              with Health360's comprehensive men's health platform.
+              with Health360's comprehensive platform.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Button size="lg" asChild className="bg-white text-purple-600 hover:bg-gray-100">
-                <Link to="/chat">Start Free Assessment</Link>
-              </Button>
-              <Button size="lg" asChild className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-purple-600 transition-colors">
-                <Link to="/catalog">Browse Products</Link>
-              </Button>
-            </div>
-            <div className="flex flex-wrap justify-center gap-3">
-              {['Fatigue & Low Energy', 'Testosterone Issues', 'Sleep Problems', 'Stress Management', 'Nutrition Guidance'].map((symptom) => (
-                <span key={symptom} className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium">
-                  {symptom}
-                </span>
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
+              {/* Lab Test Interpretation Card */}
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/15 transition-all duration-300">
+                <CardHeader className="text-center">
+                  <div className="text-4xl mb-3">🧪</div>
+                  <CardTitle className="text-xl font-semibold">Lab Test Interpretation</CardTitle>
+                  <CardDescription className="text-purple-100">
+                    Upload your lab results and get AI-powered insights into your health metrics
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <Button 
+                    size="lg" 
+                    asChild 
+                    className="w-full bg-white text-purple-600 hover:bg-gray-100 font-semibold"
+                  >
+                    <Link to="/dashboard">Upload Your Lab Test</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* AI Symptom Checker Card */}
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/15 transition-all duration-300">
+                <CardHeader className="text-center">
+                  <div className="text-4xl mb-3">🤖</div>
+                  <CardTitle className="text-xl font-semibold">AI Symptom Checker</CardTitle>
+                  <CardDescription className="text-purple-100">
+                    Take our comprehensive health assessment to get personalized recommendations
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <Button 
+                    size="lg" 
+                    asChild 
+                    className="w-full bg-transparent border-2 border-white text-white hover:bg-white hover:text-purple-600 transition-colors font-semibold"
+                  >
+                    <Link to="/chat">Start Assessment</Link>
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
