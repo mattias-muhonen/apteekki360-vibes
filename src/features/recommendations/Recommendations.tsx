@@ -8,14 +8,56 @@ const Recommendations = () => (
         subtitle="Based on your health assessment, here are tailored product and service recommendations."
     >
         <div className="page-content">
-            <div className="page-actions">
-                <Link to="/dashboard" className="action-button primary">View Dashboard</Link>
-                <Link to="/auth" className="action-button secondary">Save Progress</Link>
-            </div>
             <section className="recommendations-section">
                 <div className="section-header">
                     <h2>Primary Recommendations</h2>
                     <p>Essential steps for your health optimization journey</p>
+                    <div className="assessment-summary" style={{ 
+                        backgroundColor: '#f8f9fa', 
+                        padding: '20px', 
+                        borderRadius: '8px', 
+                        margin: '20px 0',
+                        border: '1px solid #e9ecef'
+                    }}>
+                        <h3 style={{ marginTop: '0', color: '#495057', fontSize: '18px' }}>Your Assessment Summary</h3>
+                        <p style={{ marginBottom: '10px', color: '#6c757d' }}>
+                            Based on your health assessment, our AI analysis identified key areas for optimization. 
+                            Your responses indicated concerns with energy levels, sleep quality, and overall vitality. 
+                            The following recommendations are specifically tailored to address these areas and support your health goals.
+                        </p>
+                        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '15px' }}>
+                            <span style={{ 
+                                backgroundColor: '#fff3cd', 
+                                color: '#856404', 
+                                padding: '6px 12px', 
+                                borderRadius: '20px', 
+                                fontSize: '14px',
+                                border: '1px solid #ffeaa7'
+                            }}>
+                                🎯 Energy Optimization
+                            </span>
+                            <span style={{ 
+                                backgroundColor: '#d1ecf1', 
+                                color: '#0c5460', 
+                                padding: '6px 12px', 
+                                borderRadius: '20px', 
+                                fontSize: '14px',
+                                border: '1px solid #bee5eb'
+                            }}>
+                                💤 Sleep Quality
+                            </span>
+                            <span style={{ 
+                                backgroundColor: '#d4edda', 
+                                color: '#155724', 
+                                padding: '6px 12px', 
+                                borderRadius: '20px', 
+                                fontSize: '14px',
+                                border: '1px solid #c3e6cb'
+                            }}>
+                                ⚡ Hormonal Balance
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="recommendation-cards">
@@ -88,6 +130,27 @@ const Recommendations = () => (
                         <div className="step-number">4</div>
                         <h4>Optimize</h4>
                         <p>Fine-tune your approach</p>
+                    </div>
+                </div>
+            </section>
+
+            <section className="lab-interpretation-section">
+                <div className="recommendation-card featured">
+                    <h3>Lab Test Interpretation</h3>
+                    <p>Upload your existing lab results and get AI-powered insights into your health metrics. Our advanced analysis will help you understand what your numbers mean for your health.</p>
+                    <div className="card-features">
+                        <span>✓ AI-powered analysis</span>
+                        <span>✓ Easy upload process</span>
+                        <span>✓ Personalized insights</span>
+                    </div>
+                    <div style={{ padding: '20px 0' }}>
+                        <Link
+                            to="/dashboard"
+                            className="card-button primary"
+                            style={{ border: 'none', cursor: 'pointer', textDecoration: 'none', display: 'inline-block' }}
+                        >
+                            Upload Lab Results
+                        </Link>
                     </div>
                 </div>
             </section>
