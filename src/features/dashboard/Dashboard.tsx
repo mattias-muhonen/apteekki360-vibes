@@ -105,6 +105,7 @@ const Dashboard = () => {
   ]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isChatMinimized, setIsChatMinimized] = useState(false);
 
   // Calculate dynamic health metrics based on lab results
   const healthMetrics = useMemo(() => {
@@ -440,6 +441,9 @@ const Dashboard = () => {
   }, [chatMessages]);
 
   const handleDiscussMetricWithAI = async (metric: HealthMetric) => {
+    // Ensure chat is visible when triggered
+    setIsChatMinimized(false);
+    
     const prompt = `Tell me about ${metric.title}: Current value is ${metric.value} with status ${metric.status}. Explain what ${metric.title} measures and its effects on health. ${metric.status !== 'Normal Range' && metric.status !== 'Normal' && metric.status !== 'Good' && metric.status !== 'Excellent' && metric.status !== 'Active' ? 'Since this value is not optimal, please provide a short suggestion on how to improve it.' : ''}`;
 
     // Add the prompt as a user message
@@ -521,6 +525,9 @@ const Dashboard = () => {
   };
 
   const handleChatWithAI = async () => {
+    // Ensure chat is visible when triggered
+    setIsChatMinimized(false);
+    
     // Create a summary of lab results
     const labSummary = labResults.map(result => 
       `${result.test}: ${result.result} (${result.status}, ref: ${result.referenceRange}) - ${result.date}`
@@ -972,68 +979,96 @@ const Dashboard = () => {
         {/* Chat Panel - Right Side */}
         <div className="xl:col-span-1">
           <div className="fixed bottom-0 right-4 xl:fixed xl:bottom-0 xl:right-4 xl:w-80">
-            <Card className="w-80 xl:w-80 h-[700px] flex flex-col shadow-lg">
-              <CardHeader className="flex-shrink-0 border-b">
-                <CardTitle className="text-lg">AI Health Assistant</CardTitle>
-                <p className="text-sm text-gray-600">Get instant insights about your health data</p>
+            <Card className={`w-80 xl:w-80 flex flex-col shadow-lg transition-all duration-300 ${
+              isChatMinimized ? 'h-12' : 'h-[700px]'
+            }`}>
+              <CardHeader className="flex-shrink-0 border-b p-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-lg">AI Health Assistant</CardTitle>
+                    {!isChatMinimized && (
+                      <p className="text-sm text-gray-600">Get instant insights about your health data</p>
+                    )}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsChatMinimized(!isChatMinimized)}
+                    className="h-6 w-6 p-0"
+                  >
+                    {isChatMinimized ? (
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                      </svg>
+                    ) : (
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    )}
+                  </Button>
+                </div>
               </CardHeader>
             
-            {/* Chat Messages */}
-            <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
-              {chatMessages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
-                      message.isUser
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-900'
-                    }`}
-                  >
-                    {message.text}
-                  </div>
-                </div>
-              ))}
-              {isTyping && (
-                <div className="flex justify-start">
-                  <div className="bg-gray-100 text-gray-900 rounded-lg px-3 py-2 text-sm">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            {!isChatMinimized && (
+              <>
+                {/* Chat Messages */}
+                <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+                  {chatMessages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
+                          message.isUser
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-100 text-gray-900'
+                        }`}
+                      >
+                        {message.text}
+                      </div>
                     </div>
+                  ))}
+                  {isTyping && (
+                    <div className="flex justify-start">
+                      <div className="bg-gray-100 text-gray-900 rounded-lg px-3 py-2 text-sm">
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={chatEndRef} />
+                </CardContent>
+
+                {/* Chat Input */}
+                <div className="flex-shrink-0 border-t p-4">
+                  <div className="flex space-x-2">
+                    <Input
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      placeholder="Ask about your health results..."
+                      className="flex-1"
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                    />
+                    <Button 
+                      onClick={handleSendMessage}
+                      disabled={!chatInput.trim() || isTyping}
+                      size="sm"
+                    >
+                      Send
+                    </Button>
                   </div>
                 </div>
-              )}
-              <div ref={chatEndRef} />
-            </CardContent>
-
-            {/* Chat Input */}
-            <div className="flex-shrink-0 border-t p-4">
-              <div className="flex space-x-2">
-                <Input
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="Ask about your health results..."
-                  className="flex-1"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSendMessage();
-                    }
-                  }}
-                />
-                <Button 
-                  onClick={handleSendMessage}
-                  disabled={!chatInput.trim() || isTyping}
-                  size="sm"
-                >
-                  Send
-                </Button>
-              </div>
-            </div>
+              </>
+            )}
             </Card>
           </div>
         </div>
