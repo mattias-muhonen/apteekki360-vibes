@@ -3,19 +3,6 @@ import { Link } from 'react-router-dom';
 import Page from '../../components/Page';
 import { Button, Card, CardContent, CardHeader, CardTitle } from '../../components/ui';
 import { useAuth } from '../../contexts/AuthContext';
-import UserDataService from '../../services/userDataService';
-import { plans } from '../../plans';
-import type { Plan as PlanType } from '../../plans';
-import OpenAI from 'openai';
-
-interface LabEntry {
-  date: string;
-  test: string;
-  result: string;
-  referenceRange: string;
-  status: 'Normal' | 'Low' | 'High' | 'Critical';
-  id?: string;
-}
 
 interface UserPlan {
   id: string;
@@ -30,19 +17,12 @@ interface UserPlan {
 
 const Plan: React.FC = () => {
   const { user } = useAuth();
-  const userDataService = UserDataService.getInstance();
   
-  const [labResults, setLabResults] = useState<LabEntry[]>([]);
   const [userPlans, setUserPlans] = useState<UserPlan[]>([]);
-  const [recommendedPlans, setRecommendedPlans] = useState<PlanType[]>([]);
-  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
 
   // Load user data
   useEffect(() => {
     if (user?.id) {
-      const userData = userDataService.getUserData(user.id);
-      setLabResults(userData.labResults);
-      
       // Mock user plans for now - in a real app these would come from the backend
       setUserPlans([
         {
@@ -54,93 +34,10 @@ const Plan: React.FC = () => {
           targetDate: '2025-03-01',
           nextAction: 'Complete second blood test',
           description: 'Monitoring cardiovascular health and cholesterol levels'
-        },
-        {
-          id: '2', 
-          planTitle: 'Energy Plan',
-          progress: 30,
-          status: 'active',
-          startDate: '2024-12-15',
-          targetDate: '2025-04-15',
-          nextAction: 'Schedule consultation call',
-          description: 'Addressing fatigue and optimizing energy levels'
         }
       ]);
     }
-  }, [user?.id, userDataService]);
-
-  // Get AI recommendations based on lab results
-  useEffect(() => {
-    const abnormalResults = labResults.filter(result => result.status !== 'Normal');
-    if (abnormalResults.length > 0) {
-      getAIRecommendations(abnormalResults);
-    } else {
-      // Show popular plans when no abnormal results
-      setRecommendedPlans(plans.slice(0, 3));
-    }
-  }, [labResults]);
-
-  const getAIRecommendations = async (abnormalResults: LabEntry[]) => {
-    setIsLoadingRecommendations(true);
-    
-    try {
-      const openai = new OpenAI({
-        apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-        dangerouslyAllowBrowser: true
-      });
-
-      const labSummary = abnormalResults.map(result => 
-        `${result.test}: ${result.result} (${result.status}, reference: ${result.referenceRange})`
-      ).join('\n');
-
-      const planTitles = plans.map(p => p.title).join('\n');
-
-      const prompt = `Based on these abnormal lab results:
-${labSummary}
-
-From this list of available health plans, recommend exactly 3 plans that would be most beneficial:
-${planTitles}
-
-Respond with only the exact plan titles, one per line, no additional text or formatting.`;
-
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a health expert recommending action plans based on lab results. Respond only with exact plan titles from the provided list, one per line.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        max_tokens: 200,
-        temperature: 0.3
-      });
-
-      const aiResponse = response.choices[0]?.message?.content?.trim();
-      
-      if (aiResponse) {
-        const recommendedPlanTitles = aiResponse.split('\n').map(title => title.trim()).filter(title => title);
-        
-        const recommendedPlanObjects = recommendedPlanTitles
-          .map(title => plans.find(p => p.title === title))
-          .filter((plan): plan is PlanType => plan !== undefined)
-          .slice(0, 3);
-
-        setRecommendedPlans(recommendedPlanObjects);
-      } else {
-        setRecommendedPlans(plans.slice(0, 3));
-      }
-
-    } catch (error) {
-      console.error('Error getting AI recommendations:', error);
-      setRecommendedPlans(plans.slice(0, 3));
-    } finally {
-      setIsLoadingRecommendations(false);
-    }
-  };
+  }, [user?.id]);
 
   const getPlanIcon = (title: string): string => {
     if (title.includes('Heart')) return '❤️';
@@ -216,7 +113,7 @@ Respond with only the exact plan titles, one per line, no additional text or for
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
               {userPlans.map((plan) => {
                 const colors = getPlanColor(plan.planTitle);
                 return (
@@ -228,7 +125,7 @@ Respond with only the exact plan titles, one per line, no additional text or for
                             <span className="text-2xl">{getPlanIcon(plan.planTitle)}</span>
                           </div>
                           <div>
-                            <CardTitle className="text-lg">{plan.planTitle}</CardTitle>
+                            <CardTitle className="text-xl">{plan.planTitle}</CardTitle>
                             <p className="text-sm text-gray-600">{plan.description}</p>
                           </div>
                         </div>
@@ -237,18 +134,84 @@ Respond with only the exact plan titles, one per line, no additional text or for
                         </span>
                       </div>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-6">
                       {/* Progress Bar */}
                       <div>
                         <div className="flex justify-between text-sm text-gray-600 mb-2">
-                          <span>Progress</span>
+                          <span>Overall Progress</span>
                           <span>{plan.progress}%</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full bg-gray-200 rounded-full h-3">
                           <div 
-                            className={`h-2 rounded-full ${colors.bg.replace('-100', '-500')}`}
+                            className={`h-3 rounded-full ${colors.bg.replace('-100', '-500')} transition-all duration-300`}
                             style={{ width: `${plan.progress}%` }}
                           ></div>
+                        </div>
+                      </div>
+                      
+                      {/* Detailed Progress Breakdown */}
+                      <div className={`${colors.bg} ${colors.border} border rounded-lg p-4`}>
+                        <h4 className="font-semibold text-gray-900 mb-3">Plan Milestones</h4>
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                              <span className="text-white text-sm font-bold">✓</span>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-900">Initial health assessment completed</p>
+                              <p className="text-xs text-gray-600">Completed Dec 1, 2024</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                              <span className="text-white text-sm font-bold">✓</span>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-900">First blood test completed</p>
+                              <p className="text-xs text-gray-600">Completed Dec 15, 2024</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                              <span className="text-white text-sm font-bold">✓</span>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-900">Consultation with cardiologist</p>
+                              <p className="text-xs text-gray-600">Completed Jan 8, 2025</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3">
+                            <div className={`w-6 h-6 rounded-full ${colors.bg.replace('-100', '-500')} flex items-center justify-center`}>
+                              <span className="text-white text-sm font-bold">4</span>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-900">Second blood test</p>
+                              <p className="text-xs text-gray-600">In progress</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
+                              <span className="text-white text-sm font-bold">5</span>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-400">Follow-up consultation</p>
+                              <p className="text-xs text-gray-500">Scheduled for Feb 15, 2025</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
+                              <span className="text-white text-sm font-bold">6</span>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-400">Final assessment & recommendations</p>
+                              <p className="text-xs text-gray-500">Scheduled for Mar 1, 2025</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                       
@@ -264,79 +227,54 @@ Respond with only the exact plan titles, one per line, no additional text or for
                         </div>
                       </div>
                       
+                      {/* Key Metrics Tracking */}
+                      <div className="bg-white border border-gray-200 rounded-lg p-4">
+                        <h4 className="font-semibold text-gray-900 mb-3">Key Health Metrics</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                          <div className="text-center p-3 bg-gray-50 rounded-lg">
+                            <p className="text-2xl font-bold text-gray-900">185</p>
+                            <p className="text-gray-600">Total Cholesterol</p>
+                            <p className="text-xs text-green-600">↓ from 220</p>
+                          </div>
+                          <div className="text-center p-3 bg-gray-50 rounded-lg">
+                            <p className="text-2xl font-bold text-gray-900">95</p>
+                            <p className="text-gray-600">LDL Cholesterol</p>
+                            <p className="text-xs text-green-600">↓ from 140</p>
+                          </div>
+                          <div className="text-center p-3 bg-gray-50 rounded-lg">
+                            <p className="text-2xl font-bold text-gray-900">65</p>
+                            <p className="text-gray-600">HDL Cholesterol</p>
+                            <p className="text-xs text-green-600">↑ from 45</p>
+                          </div>
+                        </div>
+                      </div>
+                      
                       {/* Next Action */}
-                      <div className={`${colors.bg} ${colors.border} border rounded-lg p-3`}>
-                        <h4 className="font-medium text-gray-900 mb-1">Next Action</h4>
-                        <p className="text-sm text-gray-700">{plan.nextAction}</p>
+                      <div className={`${colors.bg} ${colors.border} border rounded-lg p-4`}>
+                        <h4 className="font-medium text-gray-900 mb-2">Next Action Required</h4>
+                        <p className="text-sm text-gray-700 mb-3">{plan.nextAction}</p>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <span>📅</span>
+                          <span>Scheduled for: Feb 1, 2025</span>
+                        </div>
                       </div>
                       
                       {/* Action Buttons */}
-                      <div className="flex gap-3 pt-2">
-                        <Button size="sm" className="flex-1">
-                          View Details
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                        <Button size="sm" className="w-full">
+                          View Detailed Progress
                         </Button>
-                        <Button size="sm" variant="outline">
-                          Update Progress
+                        <Button size="sm" variant="outline" className="w-full">
+                          Schedule Next Test
+                        </Button>
+                        <Button size="sm" variant="outline" className="w-full">
+                          Contact Support
                         </Button>
                       </div>
                     </CardContent>
                   </Card>
                 );
               })}
-            </div>
-          )}
-        </section>
-
-        {/* Recommended Plans Section */}
-        <section className="space-y-6">
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-gray-900">Recommended Plans</h2>
-            <p className="text-gray-600">
-              {labResults.filter(r => r.status !== 'Normal').length > 0 
-                ? 'AI-selected plans based on your lab results that need attention'
-                : 'Popular health improvement plans to enhance your wellbeing'
-              }
-            </p>
-          </div>
-
-          {isLoadingRecommendations ? (
-            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-8">
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-                <span className="ml-3 text-gray-600">Getting personalized recommendations...</span>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recommendedPlans.map((plan, index) => {
-                  const colors = getPlanColor(plan.title);
-                  return (
-                    <Card key={index} className={`h-full flex flex-col hover:shadow-lg transition-all duration-200 hover:scale-105 bg-white ${colors.border}`}>
-                      <CardContent className="p-6 flex flex-col h-full">
-                        <div className={`w-12 h-12 rounded-full ${colors.bg} flex items-center justify-center mb-4`}>
-                          <span className="text-2xl">{getPlanIcon(plan.title)}</span>
-                        </div>
-                        <h3 className="font-semibold text-lg mb-3 text-gray-900">{plan.title}</h3>
-                        <p className="text-sm text-gray-600 mb-4 leading-relaxed flex-1">
-                          {plan.description}
-                        </p>
-                        <div className="flex items-center justify-between mt-auto">
-                          <span className={`text-lg font-bold ${colors.text}`}>{plan.price}</span>
-                          <Button size="sm" className={`${colors.bg.replace('-100', '-600')} hover:${colors.bg.replace('-100', '-700')} text-white`}>
-                            Start Plan
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-              <div className="mt-6 text-center">
-                <Button variant="outline" asChild>
-                  <Link to="/catalog">View All Available Plans</Link>
-                </Button>
-              </div>
             </div>
           )}
         </section>
@@ -349,15 +287,17 @@ Respond with only the exact plan titles, one per line, no additional text or for
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
-                  <span className="text-2xl">📊</span>
-                </div>
-                <h3 className="font-medium text-gray-900 mb-2">Upload Lab Results</h3>
-                <p className="text-sm text-gray-600">Add new lab data to track progress</p>
-              </CardContent>
-            </Card>
+            <Link to="/dashboard" className="block">
+              <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                    <span className="text-2xl">📊</span>
+                  </div>
+                  <h3 className="font-medium text-gray-900 mb-2">Upload Lab Results</h3>
+                  <p className="text-sm text-gray-600">Add new lab data to track progress</p>
+                </CardContent>
+              </Card>
+            </Link>
             
             <Card className="hover:shadow-md transition-shadow cursor-pointer">
               <CardContent className="p-6 text-center">
@@ -379,15 +319,17 @@ Respond with only the exact plan titles, one per line, no additional text or for
               </CardContent>
             </Card>
             
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-3">
-                  <span className="text-2xl">💬</span>
-                </div>
-                <h3 className="font-medium text-gray-900 mb-2">AI Health Chat</h3>
-                <p className="text-sm text-gray-600">Get instant health insights</p>
-              </CardContent>
-            </Card>
+            <Link to="/dashboard" className="block">
+              <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-3">
+                    <span className="text-2xl">💬</span>
+                  </div>
+                  <h3 className="font-medium text-gray-900 mb-2">AI Health Chat</h3>
+                  <p className="text-sm text-gray-600">Get instant health insights</p>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         </section>
       </div>
