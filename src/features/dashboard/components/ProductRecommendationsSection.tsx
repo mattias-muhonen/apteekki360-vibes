@@ -19,6 +19,8 @@ const ProductRecommendationsSection: React.FC<ProductRecommendationsSectionProps
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showBasedOnInfo, setShowBasedOnInfo] = useState(false);
+  const [showMoreProducts, setShowMoreProducts] = useState(false);
+  const [allRecommendations, setAllRecommendations] = useState<Product[]>([]);
 
   // Filter abnormal lab results
   const abnormalLabResults = labResults.filter(result => result.status !== 'Normal');
@@ -69,7 +71,7 @@ const ProductRecommendationsSection: React.FC<ProductRecommendationsSectionProps
       const prompt = `Based on these abnormal lab results:
 ${labSummary}
 
-From this list of available products, recommend exactly 3 products that would be most beneficial:
+From this list of available products, recommend exactly 6 products that would be most beneficial:
 ${productNames}
 
 Respond with only the exact product names, one per line, no additional text or formatting. Choose products that are most relevant to improving these specific lab values.`;
@@ -86,7 +88,7 @@ Respond with only the exact product names, one per line, no additional text or f
             content: prompt
           }
         ],
-        max_tokens: 200,
+        max_tokens: 400,
         temperature: 0.3
       });
 
@@ -99,9 +101,10 @@ Respond with only the exact product names, one per line, no additional text or f
         const recommendedProducts = recommendedProductNames
           .map(name => products.find(p => p.name === name))
           .filter((product): product is Product => product !== undefined)
-          .slice(0, 3); // Ensure we only get 3 products
+          .slice(0, 6); // Get up to 6 products
 
-        setAiRecommendedProducts(recommendedProducts);
+        setAllRecommendations(recommendedProducts);
+        setAiRecommendedProducts(recommendedProducts.slice(0, 2)); // Show first 2 initially
       } else {
         throw new Error('No recommendations received');
       }
@@ -112,7 +115,8 @@ Respond with only the exact product names, one per line, no additional text or f
       
       // Fallback to manual recommendations based on common issues
       const fallbackProducts = getFallbackRecommendations(abnormalLabResults);
-      setAiRecommendedProducts(fallbackProducts);
+      setAllRecommendations(fallbackProducts);
+      setAiRecommendedProducts(fallbackProducts.slice(0, 2));
     } finally {
       setIsLoading(false);
     }
@@ -150,23 +154,25 @@ Respond with only the exact product names, one per line, no additional text or f
       }
     }
     
-    // Add multivitamin if we need more recommendations
-    if (recommendations.length < 3) {
-      const multivitamin = products.find(p => p.name.includes('Multivita Plus'));
-      if (multivitamin && !recommendations.find(r => r.name === multivitamin.name)) {
-        recommendations.push(multivitamin);
+    // Add more general health products to reach 6 recommendations
+    const additionalProducts = [
+      'Multivita Plus Monivitamiini',
+      'Harmonia Ksm66',
+      'Puhdas+ Vahva Ashwagandha + Bioperine 150mg',
+      'Puhdas+ Quattro Magnesium',
+      'Minisun Monivitamiini Vahva',
+      'Puhdas+ Vahva Kurkumiini + Bioperine 250mg'
+    ];
+    
+    for (const productName of additionalProducts) {
+      if (recommendations.length >= 6) break;
+      const product = products.find(p => p.name === productName);
+      if (product && !recommendations.find(r => r.name === product.name)) {
+        recommendations.push(product);
       }
     }
     
-    // Add stress management if still need more
-    if (recommendations.length < 3) {
-      const stress = products.find(p => p.name.includes('Harmonia') || p.name.includes('Ashwagandha'));
-      if (stress && !recommendations.find(r => r.name === stress.name)) {
-        recommendations.push(stress);
-      }
-    }
-    
-    return recommendations.slice(0, 3);
+    return recommendations.slice(0, 6);
   };
 
   // Create blood test monitoring recommendation
@@ -178,12 +184,28 @@ Respond with only the exact product names, one per line, no additional text or f
   };
 
   // Show AI recommendations if we have abnormal results, otherwise show original recommendations
-  const baseProducts = abnormalLabResults.length > 0 ? aiRecommendedProducts : recommendations;
+  const baseProducts = abnormalLabResults.length > 0 
+    ? (showMoreProducts ? allRecommendations : aiRecommendedProducts)
+    : (showMoreProducts ? recommendations : recommendations.slice(0, 2));
   
-  // Always add blood test as first recommendation, then show 2 other products
+  // Always add blood test as first recommendation, then show other products
   const displayProducts = baseProducts.length > 0 
-    ? [bloodTestRecommendation, ...baseProducts.slice(0, 2)]
+    ? [bloodTestRecommendation, ...baseProducts]
     : [bloodTestRecommendation];
+
+  const handleShowMoreProducts = () => {
+    if (abnormalLabResults.length > 0) {
+      // For abnormal results, show all AI recommendations
+      setShowMoreProducts(true);
+    } else {
+      // For normal results, show all original recommendations
+      setShowMoreProducts(true);
+    }
+  };
+
+  const hasMoreProducts = abnormalLabResults.length > 0 
+    ? allRecommendations.length > 2
+    : recommendations.length > 2;
 
   if (displayProducts.length === 0 && !isLoading && !error && !allResultsNormal) {
     return null;
@@ -310,9 +332,19 @@ Respond with only the exact product names, one per line, no additional text or f
             ))}
           </div>
           <div className="mt-6">
-            <Button variant="outline" asChild>
-              <Link to="/catalog">More products</Link>
-            </Button>
+            {!showMoreProducts && hasMoreProducts ? (
+              <Button variant="outline" onClick={handleShowMoreProducts}>
+                More recommendations
+              </Button>
+            ) : showMoreProducts ? (
+              <Button variant="outline" onClick={() => setShowMoreProducts(false)}>
+                Show less
+              </Button>
+            ) : (
+              <Button variant="outline" asChild>
+                <Link to="/catalog">Browse catalog</Link>
+              </Button>
+            )}
           </div>
         </div>
       )}
