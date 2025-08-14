@@ -7,7 +7,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import UserDataService from '../../services/userDataService';
 
 // Import section components
-import HealthSummarySection from './components/HealthSummarySection';
 import ProductRecommendationsSection from './components/ProductRecommendationsSection';
 import ActionPlanSection from './components/ActionPlanSection';
 import HealthMetricsOverviewSection from './components/HealthMetricsOverviewSection';
@@ -530,20 +529,22 @@ const Dashboard = () => {
 
   return (
   <Page 
-    title="Health Dashboard" 
+    title="My Health360 Dashboard" 
     subtitle="Track your progress and monitor key health metrics over time."
   >
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {/* Main Content - Left Side */}
         <div className="xl:col-span-3 space-y-12">
-          
-          {/* Health Summary Section */}
-          <HealthSummarySection 
+
+
+           {/* Health Metrics Overview */}
+          <HealthMetricsOverviewSection 
             healthSummary={healthSummary}
-            onLabResultsAdded={handleLabResultsAdded}
-            onChatWithAI={handleChatWithAI}
             labResults={labResults}
+            onChatWithAI={handleChatWithAI}
+            onDiscussLabResultWithAI={handleDiscussLabResultWithAI}
+            onLabResultsAdded={handleLabResultsAdded}
           />
 
           {/* Product Recommendations Section */}
@@ -557,14 +558,7 @@ const Dashboard = () => {
           {/* Your Recommended Action Plan Section */}
           <ActionPlanSection labResults={labResults} />
 
- {/* Health Metrics Overview */}
-          <HealthMetricsOverviewSection 
-            healthSummary={healthSummary}
-            labResults={labResults}
-            onChatWithAI={handleChatWithAI}
-            onDiscussLabResultWithAI={handleDiscussLabResultWithAI}
-            onLabResultsAdded={handleLabResultsAdded}
-          />
+
 
           {/* Lab Results Section */}
           <LabResultsSection 

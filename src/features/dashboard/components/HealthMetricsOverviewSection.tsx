@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Card, CardContent, CardHeader, CardTitle } from '../../../components/ui';
 import LabUpload from '../../lab-upload/LabUpload';
+import OpenAI from 'openai';
 
 interface LabEntry {
   date: string;
@@ -15,6 +16,15 @@ interface LabEntry {
 interface HealthSummary {
   alertLevel: 'good' | 'warning' | 'danger' | 'no-data';
   summaryText: string;
+}
+
+interface BloodPanelRecommendation {
+  name: string;
+  description: string;
+  price: string;
+  keyTests: string[];
+  frequency: string;
+  benefits: string[];
 }
 
 interface HealthMetricsOverviewSectionProps {
@@ -32,6 +42,98 @@ const HealthMetricsOverviewSection: React.FC<HealthMetricsOverviewSectionProps> 
   onDiscussLabResultWithAI,
   onLabResultsAdded
 }) => {
+  const [bloodPanelRecommendation, setBloodPanelRecommendation] = useState<BloodPanelRecommendation | null>(null);
+  const [isLoadingRecommendation, setIsLoadingRecommendation] = useState(false);
+  const [showRecommendation, setShowRecommendation] = useState(false);
+
+  // Check if there are any abnormal results
+  const hasAbnormalResults = labResults.some(result => result.status !== 'Normal');
+
+  useEffect(() => {
+    if (hasAbnormalResults) {
+      getBloodPanelRecommendation();
+    }
+  }, [hasAbnormalResults, labResults]);
+
+  const getBloodPanelRecommendation = async () => {
+    if (!hasAbnormalResults) return;
+
+    setIsLoadingRecommendation(true);
+
+    try {
+      const openai = new OpenAI({
+        apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+        dangerouslyAllowBrowser: true
+      });
+
+      const abnormalResults = labResults.filter(result => result.status !== 'Normal');
+      const labSummary = abnormalResults.map(result => 
+        `${result.test}: ${result.result} (${result.status}, reference: ${result.referenceRange})`
+      ).join('\n');
+
+      const prompt = `Based on these abnormal lab results:
+${labSummary}
+
+Create a specific blood panel recommendation as a product. Respond in this exact JSON format:
+{
+  "name": "specific panel name (e.g., 'Comprehensive Metabolic Monitoring Panel', 'Cardiac Risk Assessment Panel')",
+  "description": "detailed description of what this panel monitors and why it's important for these specific results",
+  "price": "price in euros (e.g., '189 €')",
+  "keyTests": ["test1", "test2", "test3", "test4", "test5"],
+  "frequency": "recommended frequency (e.g., 'Every 3 months', 'Every 6 months')",
+  "benefits": ["benefit1", "benefit2", "benefit3"]
+}
+
+Make the panel name specific and medical-sounding, not generic. Include 5 key tests that would be most relevant for monitoring these abnormal values.`;
+
+      const response = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a medical expert recommending specific blood panels for monitoring abnormal lab values. Respond only with valid JSON.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        max_tokens: 500,
+        temperature: 0.3
+      });
+
+      const aiResponse = response.choices[0]?.message?.content?.trim();
+      
+      if (aiResponse) {
+        try {
+          const recommendation = JSON.parse(aiResponse) as BloodPanelRecommendation;
+          setBloodPanelRecommendation(recommendation);
+        } catch (parseError) {
+          console.error('Error parsing AI response:', parseError);
+          setFallbackRecommendation();
+        }
+      } else {
+        setFallbackRecommendation();
+      }
+
+    } catch (error) {
+      console.error('Error getting blood panel recommendation:', error);
+      setFallbackRecommendation();
+    } finally {
+      setIsLoadingRecommendation(false);
+    }
+  };
+
+  const setFallbackRecommendation = () => {
+    setBloodPanelRecommendation({
+      name: "Comprehensive Health Monitoring Panel",
+      description: "A targeted blood panel designed to monitor and track the specific health markers that showed abnormal values in your recent tests. This panel helps ensure your health improvements are progressing as expected.",
+      price: "149 €",
+      keyTests: ["Complete Blood Count", "Comprehensive Metabolic Panel", "Lipid Profile", "Thyroid Function", "Inflammatory Markers"],
+      frequency: "Every 3 months",
+      benefits: ["Track improvement progress", "Early detection of changes", "Personalized health insights"]
+    });
+  };
   return (
     <section className="space-y-6">
       <div className="space-y-2">
@@ -87,6 +189,9 @@ const HealthMetricsOverviewSection: React.FC<HealthMetricsOverviewSectionProps> 
               </div>
             </div>
             <div className="flex flex-wrap justify-center gap-3">
+              <div className="w-full max-w-md">
+                <LabUpload onResultsAdded={onLabResultsAdded} />
+              </div>
               <Button size="sm" variant="outline" onClick={onChatWithAI} className="flex items-center gap-2">
                 <span>💬</span>
                 Chat with AI about maintaining health
@@ -117,6 +222,9 @@ const HealthMetricsOverviewSection: React.FC<HealthMetricsOverviewSectionProps> 
                 </div>
               </div>
               <div className="flex flex-wrap gap-3">
+                <div className="w-full sm:w-auto">
+                  <LabUpload onResultsAdded={onLabResultsAdded} />
+                </div>
                 <Button size="sm" variant="outline" onClick={onChatWithAI} className="flex items-center gap-2">
                   <span>💬</span>
                   Chat with AI about your results
@@ -127,12 +235,92 @@ const HealthMetricsOverviewSection: React.FC<HealthMetricsOverviewSectionProps> 
                     Book Consultation
                   </Link>
                 </Button>
+                {hasAbnormalResults && isLoadingRecommendation && (
+                  <Button size="sm" variant="outline" disabled className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    Getting recommendation...
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
 
+          {/* Blood Panel Recommendation Accordion */}
+          {hasAbnormalResults && bloodPanelRecommendation && (
+            <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+              <CardHeader 
+                className="pb-4 cursor-pointer hover:bg-blue-100/50 transition-colors rounded-t-lg"
+                onClick={() => setShowRecommendation(!showRecommendation)}
+              >
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-semibold text-blue-900 flex items-center gap-2">
+                    <span>🩸</span>
+                    Recommended Blood Panel: {bloodPanelRecommendation.name}
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl font-bold text-blue-600">{bloodPanelRecommendation.price}</span>
+                    <span className={`transform transition-transform duration-200 ${showRecommendation ? 'rotate-180' : ''}`}>
+                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </CardHeader>
+              
+              {showRecommendation && (
+                <CardContent className="space-y-4 animate-in slide-in-from-top-2 duration-200">
+                  <p className="text-gray-700 leading-relaxed">
+                    {bloodPanelRecommendation.description}
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">Key Tests Included:</h4>
+                      <ul className="space-y-1">
+                        {bloodPanelRecommendation.keyTests.map((test, index) => (
+                          <li key={index} className="text-sm text-gray-600 flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
+                            {test}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">Benefits:</h4>
+                      <ul className="space-y-1">
+                        {bloodPanelRecommendation.benefits.map((benefit, index) => (
+                          <li key={index} className="text-sm text-gray-600 flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-green-600 rounded-full"></span>
+                            {benefit}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between pt-4 border-t border-blue-200">
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm text-gray-600">Recommended: {bloodPanelRecommendation.frequency}</span>
+                    </div>
+                    <Button className="bg-blue-600 hover:bg-blue-700">
+                      Book This Panel
+                    </Button>
+                  </div>
+                </CardContent>
+              )}
+            </Card>
+          )}
+
           {/* Show individual abnormal results */}
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Detailed Lab Results Analysis</h3>
+              <div className="flex items-center gap-3">
+                <LabUpload onResultsAdded={onLabResultsAdded} />
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {labResults
                 .filter(result => result.status !== 'Normal')
