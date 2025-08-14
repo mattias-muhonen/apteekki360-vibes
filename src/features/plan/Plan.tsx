@@ -87,15 +87,171 @@ const Plan: React.FC = () => {
   };
 
   return (
-    <Page title="My Health Plan" subtitle="Track your personalized health journey and discover new plans">
+    <Page>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-        
-        {/* Active Plans Section */}
+                {/* Today's Tasks Section */}
         <section className="space-y-6">
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-gray-900">My Active Plans</h2>
-            <p className="text-gray-600">Track progress on your current health improvement plans</p>
+            <h2 className="text-2xl font-bold text-gray-900">Today's Tasks</h2>
+            <p className="text-gray-600">Complete these daily activities for optimal health progress</p>
           </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Exercise Task */}
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                      <span className="text-xl">🏃‍♂️</span>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-900">Exercise</h3>
+                      <p className="text-sm text-gray-600">30 minutes cardio</p>
+                    </div>
+                  </div>
+                  <input type="checkbox" className="w-5 h-5 text-blue-600 rounded" />
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Target:</span>
+                    <span className="font-medium">30 min moderate intensity</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Best time:</span>
+                    <span className="font-medium">Morning (7-9 AM)</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Calories:</span>
+                    <span className="font-medium">~250-300 kcal</span>
+                  </div>
+                  <Button size="sm" className="w-full mt-4">
+                    Start Workout
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Nutrition Task */}
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                      <span className="text-xl">🥗</span>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-900">Nutrition</h3>
+                      <p className="text-sm text-gray-600">Balanced meal planning</p>
+                    </div>
+                  </div>
+                  <input type="checkbox" className="w-5 h-5 text-green-600 rounded" />
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Protein goal:</span>
+                    <span className="font-medium">120g</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Vegetables:</span>
+                    <span className="font-medium">5 servings</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Water intake:</span>
+                    <span className="font-medium">2.5 liters</span>
+                  </div>
+                  <Button size="sm" className="w-full mt-4">
+                    Log Meals
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Vitamins Task */}
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                      <span className="text-xl">💊</span>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-900">Vitamins</h3>
+                      <p className="text-sm text-gray-600">Daily supplements</p>
+                    </div>
+                  </div>
+                  <input type="checkbox" className="w-5 h-5 text-orange-600 rounded" />
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Vitamin D3:</span>
+                    <span className="font-medium">2000 IU</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Omega-3:</span>
+                    <span className="font-medium">1000mg</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Magnesium:</span>
+                    <span className="font-medium">400mg</span>
+                  </div>
+                  <Button size="sm" className="w-full mt-4">
+                    Mark as Taken
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Daily Progress Summary */}
+          <Card className="bg-gradient-to-r from-blue-50 to-green-50 border-blue-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">Today's Progress</h3>
+                  <p className="text-sm text-gray-600">August 14, 2025</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-blue-600">0/3</div>
+                  <div className="text-sm text-gray-600">Tasks completed</div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                <div className="text-center">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-2">
+                    <span className="text-sm">🏃‍♂️</span>
+                  </div>
+                  <div className="text-xs text-gray-600">Exercise</div>
+                </div>
+                <div className="text-center">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-2">
+                    <span className="text-sm">🥗</span>
+                  </div>
+                  <div className="text-xs text-gray-600">Nutrition</div>
+                </div>
+                <div className="text-center">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-2">
+                    <span className="text-sm">💊</span>
+                  </div>
+                  <div className="text-xs text-gray-600">Vitamins</div>
+                </div>
+              </div>
+              
+              <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+                <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{width: '0%'}}></div>
+              </div>
+              
+              <p className="text-sm text-gray-600 text-center">
+                Complete all tasks to maintain your health plan momentum! 🎯
+              </p>
+            </CardContent>
+          </Card>
+        </section>
+
+
+        {/* Active Plans Section */}
+        <section className="space-y-6">
 
           {userPlans.length === 0 ? (
             <Card className="border-2 border-dashed border-gray-300 bg-gray-50">
@@ -148,114 +304,111 @@ const Plan: React.FC = () => {
                           ></div>
                         </div>
                       </div>
-                      
-                      {/* Detailed Progress Breakdown */}
-                      <div className={`${colors.bg} ${colors.border} border rounded-lg p-4`}>
-                        <h4 className="font-semibold text-gray-900 mb-3">Plan Milestones</h4>
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
-                              <span className="text-white text-sm font-bold">✓</span>
+
+                      {/* Health Metrics Progress */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Cholesterol Progress */}
+                        <div className="bg-gray-50 rounded-lg p-4">
+                          <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                            <span>🩺</span>
+                            Total Cholesterol
+                          </h4>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Starting:</span>
+                              <span className="font-medium text-red-600">240 mg/dL</span>
                             </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-900">Initial health assessment completed</p>
-                              <p className="text-xs text-gray-600">Completed Dec 1, 2024</p>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Current:</span>
+                              <span className="font-medium text-orange-600">210 mg/dL</span>
                             </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
-                              <span className="text-white text-sm font-bold">✓</span>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Goal:</span>
+                              <span className="font-medium text-green-600">&lt;200 mg/dL</span>
                             </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-900">First blood test completed</p>
-                              <p className="text-xs text-gray-600">Completed Dec 15, 2024</p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
-                              <span className="text-white text-sm font-bold">✓</span>
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-900">Consultation with cardiologist</p>
-                              <p className="text-xs text-gray-600">Completed Jan 8, 2025</p>
+                            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                              <div className="bg-orange-500 h-2 rounded-full" style={{width: '75%'}}></div>
                             </div>
                           </div>
-                          
-                          <div className="flex items-center gap-3">
-                            <div className={`w-6 h-6 rounded-full ${colors.bg.replace('-100', '-500')} flex items-center justify-center`}>
-                              <span className="text-white text-sm font-bold">4</span>
+                        </div>
+
+                        {/* Blood Pressure Progress */}
+                        <div className="bg-gray-50 rounded-lg p-4">
+                          <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                            <span>💓</span>
+                            Blood Pressure
+                          </h4>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Starting:</span>
+                              <span className="font-medium text-red-600">140/90</span>
                             </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-900">Second blood test</p>
-                              <p className="text-xs text-gray-600">In progress</p>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Current:</span>
+                              <span className="font-medium text-orange-600">125/80</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Goal:</span>
+                              <span className="font-medium text-green-600">&lt;120/80</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                              <div className="bg-orange-500 h-2 rounded-full" style={{width: '70%'}}></div>
                             </div>
                           </div>
-                          
-                          <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
-                              <span className="text-white text-sm font-bold">5</span>
+                        </div>
+
+                        {/* Weight Progress */}
+                        <div className="bg-gray-50 rounded-lg p-4">
+                          <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                            <span>⚖️</span>
+                            Weight
+                          </h4>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Starting:</span>
+                              <span className="font-medium text-gray-600">185 lbs</span>
                             </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-400">Follow-up consultation</p>
-                              <p className="text-xs text-gray-500">Scheduled for Feb 15, 2025</p>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Current:</span>
+                              <span className="font-medium text-blue-600">178 lbs</span>
                             </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
-                              <span className="text-white text-sm font-bold">6</span>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Goal:</span>
+                              <span className="font-medium text-green-600">170 lbs</span>
                             </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-400">Final assessment & recommendations</p>
-                              <p className="text-xs text-gray-500">Scheduled for Mar 1, 2025</p>
+                            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                              <div className="bg-blue-500 h-2 rounded-full" style={{width: '47%'}}></div>
                             </div>
                           </div>
                         </div>
                       </div>
-                      
-                      {/* Timeline */}
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-500">Started:</span>
-                          <p className="font-medium">{formatDate(plan.startDate)}</p>
-                        </div>
-                        <div>
-                          <span className="text-gray-500">Target:</span>
-                          <p className="font-medium">{formatDate(plan.targetDate)}</p>
-                        </div>
-                      </div>
-                      
-                      {/* Key Metrics Tracking */}
-                      <div className="bg-white border border-gray-200 rounded-lg p-4">
-                        <h4 className="font-semibold text-gray-900 mb-3">Key Health Metrics</h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-                          <div className="text-center p-3 bg-gray-50 rounded-lg">
-                            <p className="text-2xl font-bold text-gray-900">185</p>
-                            <p className="text-gray-600">Total Cholesterol</p>
-                            <p className="text-xs text-green-600">↓ from 220</p>
+
+                      {/* Timeline and Milestones */}
+                      <div className="bg-blue-50 rounded-lg p-4">
+                        <h4 className="font-medium text-gray-900 mb-3">Plan Timeline</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                          <div>
+                            <span className="text-gray-600">Started:</span>
+                            <div className="font-medium">{formatDate(plan.startDate)}</div>
                           </div>
-                          <div className="text-center p-3 bg-gray-50 rounded-lg">
-                            <p className="text-2xl font-bold text-gray-900">95</p>
-                            <p className="text-gray-600">LDL Cholesterol</p>
-                            <p className="text-xs text-green-600">↓ from 140</p>
+                          <div>
+                            <span className="text-gray-600">Target Date:</span>
+                            <div className="font-medium">{formatDate(plan.targetDate)}</div>
                           </div>
-                          <div className="text-center p-3 bg-gray-50 rounded-lg">
-                            <p className="text-2xl font-bold text-gray-900">65</p>
-                            <p className="text-gray-600">HDL Cholesterol</p>
-                            <p className="text-xs text-green-600">↑ from 45</p>
+                          <div>
+                            <span className="text-gray-600">Days Remaining:</span>
+                            <div className="font-medium text-blue-600">28 days</div>
                           </div>
                         </div>
                       </div>
                       
                       {/* Next Action */}
-                      <div className={`${colors.bg} ${colors.border} border rounded-lg p-4`}>
+                      <div className={`${colors.border} border rounded-lg p-4`}>
                         <h4 className="font-medium text-gray-900 mb-2">Next Action Required</h4>
                         <p className="text-sm text-gray-700 mb-3">{plan.nextAction}</p>
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <span>📅</span>
-                          <span>Scheduled for: Feb 1, 2025</span>
+                          <span>Scheduled for: Aug 20, 2025</span>
                         </div>
                       </div>
                       
@@ -264,12 +417,6 @@ const Plan: React.FC = () => {
                         <Button size="sm" className="w-full">
                           View Detailed Progress
                         </Button>
-                        <Button size="sm" variant="outline" className="w-full">
-                          Schedule Next Test
-                        </Button>
-                        <Button size="sm" variant="outline" className="w-full">
-                          Contact Support
-                        </Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -277,60 +424,6 @@ const Plan: React.FC = () => {
               })}
             </div>
           )}
-        </section>
-
-        {/* Quick Actions Section */}
-        <section className="space-y-6">
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-gray-900">Quick Actions</h2>
-            <p className="text-gray-600">Common actions to manage your health plans</p>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link to="/dashboard" className="block">
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
-                    <span className="text-2xl">📊</span>
-                  </div>
-                  <h3 className="font-medium text-gray-900 mb-2">Upload Lab Results</h3>
-                  <p className="text-sm text-gray-600">Add new lab data to track progress</p>
-                </CardContent>
-              </Card>
-            </Link>
-            
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
-                  <span className="text-2xl">📅</span>
-                </div>
-                <h3 className="font-medium text-gray-900 mb-2">Schedule Consultation</h3>
-                <p className="text-sm text-gray-600">Book a call with health experts</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
-                  <span className="text-2xl">🎯</span>
-                </div>
-                <h3 className="font-medium text-gray-900 mb-2">Set Goals</h3>
-                <p className="text-sm text-gray-600">Define your health targets</p>
-              </CardContent>
-            </Card>
-            
-            <Link to="/dashboard" className="block">
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-3">
-                    <span className="text-2xl">💬</span>
-                  </div>
-                  <h3 className="font-medium text-gray-900 mb-2">AI Health Chat</h3>
-                  <p className="text-sm text-gray-600">Get instant health insights</p>
-                </CardContent>
-              </Card>
-            </Link>
-          </div>
         </section>
       </div>
     </Page>
