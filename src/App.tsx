@@ -10,6 +10,7 @@ import Insights from './features/insights/Insights';
 import Confirmation from './features/confirmation/Confirmation';
 import Tiers from './features/tiers/Tiers';
 import Landing from './features/landing/Landing';
+import Stories from './features/stories/Stories';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
@@ -23,6 +24,7 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/recommendations" element={<Recommendations />} />
+          <Route path="/stories" element={<Stories />} />
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Dashboard />

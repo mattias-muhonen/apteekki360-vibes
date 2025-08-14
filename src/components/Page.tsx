@@ -58,6 +58,15 @@ const Page: React.FC<PageProps> = ({
                 </Link>
               )}
               <Link 
+                to="/stories" 
+                className={cn(
+                  "text-gray-600 hover:text-purple-600 transition-colors",
+                  location.pathname === '/stories' && "text-purple-600 font-medium"
+                )}
+              >
+                Stories
+              </Link>
+              <Link 
                 to="/catalog" 
                 className={cn(
                   "text-gray-600 hover:text-purple-600 transition-colors",
