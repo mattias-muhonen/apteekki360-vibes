@@ -22,6 +22,7 @@ const ProductRecommendationsSection: React.FC<ProductRecommendationsSectionProps
 
   // Filter abnormal lab results
   const abnormalLabResults = labResults.filter(result => result.status !== 'Normal');
+  const allResultsNormal = labResults.length > 0 && abnormalLabResults.length === 0;
 
   // Close tooltip when clicking outside
   useEffect(() => {
@@ -168,10 +169,23 @@ Respond with only the exact product names, one per line, no additional text or f
     return recommendations.slice(0, 3);
   };
 
-  // Show AI recommendations if we have abnormal results, otherwise show original recommendations
-  const displayProducts = abnormalLabResults.length > 0 ? aiRecommendedProducts : recommendations;
+  // Create blood test monitoring recommendation
+  const bloodTestRecommendation: Product = {
+    name: "Blood Test Monitoring",
+    price: "From 49,90 €",
+    description: "Regular blood work monitoring is essential for tracking your health progress and catching potential issues early. Schedule comprehensive testing every 6-12 months to maintain optimal health.",
+    image_url: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=400&fit=crop&auto=format"
+  };
 
-  if (displayProducts.length === 0 && !isLoading && !error) {
+  // Show AI recommendations if we have abnormal results, otherwise show original recommendations
+  const baseProducts = abnormalLabResults.length > 0 ? aiRecommendedProducts : recommendations;
+  
+  // Always add blood test as first recommendation, then show 2 other products
+  const displayProducts = baseProducts.length > 0 
+    ? [bloodTestRecommendation, ...baseProducts.slice(0, 2)]
+    : [bloodTestRecommendation];
+
+  if (displayProducts.length === 0 && !isLoading && !error && !allResultsNormal) {
     return null;
   }
 
@@ -263,7 +277,14 @@ Respond with only the exact product names, one per line, no additional text or f
                       />
                     </div>
                   )}
-                  <h3 className="font-semibold text-sm mb-2 line-clamp-2">{product.name}</h3>
+                  <h3 className="font-semibold text-sm mb-2 line-clamp-2">
+                    {index === 0 && product.name === "Blood Test Monitoring" && (
+                      <span className="inline-flex items-center gap-1">
+                        🩸 {product.name}
+                      </span>
+                    )}
+                    {!(index === 0 && product.name === "Blood Test Monitoring") && product.name}
+                  </h3>
                   <p className="text-xs text-gray-600 mb-3 line-clamp-3 leading-relaxed flex-1">
                     {product.description ? 
                       product.description.substring(0, 120) + '...' : 
@@ -272,11 +293,17 @@ Respond with only the exact product names, one per line, no additional text or f
                   </p>
                   <div className="flex items-center justify-between mt-auto">
                     <span className="text-lg font-bold text-green-600">{product.price}</span>
-                    <Button size="sm" variant="outline" asChild>
-                      <Link to={`/catalog?search=${encodeURIComponent(product.name)}`}>
-                        View Product
-                      </Link>
-                    </Button>
+                    {product.name === "Blood Test Monitoring" ? (
+                      <Button size="sm" variant="outline" className="bg-blue-50 border-blue-200 hover:bg-blue-100">
+                        Schedule Test
+                      </Button>
+                    ) : (
+                      <Button size="sm" variant="outline" asChild>
+                        <Link to={`/catalog?search=${encodeURIComponent(product.name)}`}>
+                          View Product
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>

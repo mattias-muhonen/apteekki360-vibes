@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Card, CardContent, CardHeader, CardTitle } from '../../../components/ui';
+import LabUpload from '../../lab-upload/LabUpload';
 
 interface LabEntry {
   date: string;
@@ -21,13 +22,15 @@ interface HealthMetricsOverviewSectionProps {
   labResults: LabEntry[];
   onChatWithAI: () => void;
   onDiscussLabResultWithAI?: (labResult: LabEntry) => void;
+  onLabResultsAdded?: (results: any) => void;
 }
 
 const HealthMetricsOverviewSection: React.FC<HealthMetricsOverviewSectionProps> = ({
   healthSummary,
   labResults,
   onChatWithAI,
-  onDiscussLabResultWithAI
+  onDiscussLabResultWithAI,
+  onLabResultsAdded
 }) => {
   return (
     <section className="space-y-6">
@@ -48,10 +51,7 @@ const HealthMetricsOverviewSection: React.FC<HealthMetricsOverviewSectionProps> 
               Upload your lab results to see detailed health metrics, trends, and personalized insights about your health status.
             </p>
             <div className="flex justify-center">
-              <Button size="sm" variant="outline" onClick={onChatWithAI} className="flex items-center gap-2">
-                <span>💬</span>
-                Upload Lab Results to Get Started
-              </Button>
+              <LabUpload onResultsAdded={onLabResultsAdded} />
             </div>
           </CardContent>
         </Card>
