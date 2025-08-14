@@ -1,14 +1,18 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import Page from '../../components/Page';
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '../../components/ui';
-import LabUpload from '../lab-upload/LabUpload';
 import { products } from '../../products';
 import type { Product } from '../../products';
 import { generateAIHealthResponse } from '../../services/openai';
 import { useAuth } from '../../contexts/AuthContext';
 import UserDataService from '../../services/userDataService';
-import { Trash2 } from 'lucide-react';
+
+// Import section components
+import HealthSummarySection from './components/HealthSummarySection';
+import ProductRecommendationsSection from './components/ProductRecommendationsSection';
+import ActionPlanSection from './components/ActionPlanSection';
+import HealthMetricsOverviewSection from './components/HealthMetricsOverviewSection';
+import LabResultsSection from './components/LabResultsSection';
+import ChatPanel from './components/ChatPanel';
 
 interface LabResult {
   test: string;
@@ -85,6 +89,20 @@ const Dashboard = () => {
       userDataService.deleteLabResult(user.id, resultId);
       const updatedData = userDataService.getUserData(user.id);
       setLabResults(updatedData.labResults);
+    }
+  };
+
+  // Function to delete all lab results for a specific date
+  const handleDeleteDateGroup = (date: string) => {
+    if (user?.id) {
+      // Get current lab results
+      const userData = userDataService.getUserData(user.id);
+      // Filter out all results from the specified date
+      const filteredResults = userData.labResults.filter(result => result.date !== date);
+      // Update the lab results
+      userDataService.updateLabResults(user.id, filteredResults);
+      // Refresh the display
+      setLabResults(filteredResults);
     }
   };
 
@@ -250,6 +268,15 @@ const Dashboard = () => {
 
   // Generate health summary and product recommendations
   const healthSummary = useMemo(() => {
+    // Handle case when there are no lab results
+    if (labResults.length === 0) {
+      return {
+        summaryText: 'Summary can be provided when lab results are uploaded.',
+        alertLevel: 'no-data' as const,
+        recommendations: []
+      };
+    }
+
     const statusCounts = labResults.reduce((acc, result) => {
       acc[result.status] = (acc[result.status] || 0) + 1;
       return acc;
@@ -684,588 +711,51 @@ const Dashboard = () => {
         <div className="xl:col-span-3 space-y-12">
           
           {/* Health Summary Section */}
-          <section className="space-y-6">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Health Summary</h2>
-              <p className="text-gray-600">Your current health status at a glance</p>
-            </div>
-            <Card className={`border-l-4 shadow-sm hover:shadow-md transition-shadow ${
-              healthSummary.alertLevel === 'good' ? 'border-l-green-500' :
-              healthSummary.alertLevel === 'warning' ? 'border-l-yellow-500' :
-              'border-l-red-500'
-            }`}>
-              <CardHeader className="pb-4">
-                <div className="flex items-center space-x-4">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    healthSummary.alertLevel === 'good' ? 'bg-green-100' :
-                    healthSummary.alertLevel === 'warning' ? 'bg-yellow-100' :
-                    'bg-red-100'
-                  }`}>
-                    <span className={`text-xl ${
-                      healthSummary.alertLevel === 'good' ? 'text-green-600' :
-                      healthSummary.alertLevel === 'warning' ? 'text-yellow-600' :
-                      'text-red-600'
-                    }`}>
-                      {healthSummary.alertLevel === 'good' ? '✓' :
-                       healthSummary.alertLevel === 'warning' ? '⚠️' : '⚠️'}
-                    </span>
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl font-semibold text-gray-900">Overall Health Status</CardTitle>
-                    <p className="text-gray-600 text-sm mt-1">Based on your latest lab results</p>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-gray-800 mb-6 leading-relaxed">{healthSummary.summaryText}</p>
-                <div className="flex flex-wrap gap-3">
-                  <Button size="sm" variant="outline" onClick={handleChatWithAI} className="flex items-center gap-2">
-                    <span>💬</span>
-                    Chat with AI about your results
-                  </Button>
-                  {healthSummary.alertLevel !== 'good' && (
-                    <Button size="sm" asChild>
-                      <Link to="/booking" className="flex items-center gap-2">
-                        <span>📅</span>
-                        Book Consultation
-                      </Link>
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </section>
+          <HealthSummarySection 
+            healthSummary={healthSummary}
+            onLabResultsAdded={handleLabResultsAdded}
+            onChatWithAI={handleChatWithAI}
+          />
 
           {/* Product Recommendations Section */}
           {healthSummary.recommendations.length > 0 && (
-            <section className="space-y-6">
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-gray-900">Recommended for You</h2>
-                <p className="text-gray-600">Personalized product suggestions based on your health metrics</p>
-              </div>
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {healthSummary.recommendations.slice(0, 3).map((product, index) => (
-                    <Card key={index} className="h-full flex flex-col hover:shadow-lg transition-all duration-200 hover:scale-105 bg-white">
-                      <CardContent className="p-4 flex flex-col h-full">
-                        {product.image_url && (
-                          <div className="aspect-square w-full mb-3 bg-gray-100 rounded-lg overflow-hidden">
-                            <img 
-                              src={product.image_url} 
-                              alt={product.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        )}
-                        <h3 className="font-semibold text-sm mb-2 line-clamp-2">{product.name}</h3>
-                        <p className="text-xs text-gray-600 mb-3 line-clamp-3 leading-relaxed flex-1">
-                          {product.description ? 
-                            product.description.substring(0, 120) + '...' : 
-                            'Quality health product to support your wellness journey'
-                          }
-                        </p>
-                        <div className="flex items-center justify-between mt-auto">
-                          <span className="text-lg font-bold text-green-600">{product.price}</span>
-                          <Button size="sm" variant="outline" asChild>
-                            <Link to={`/catalog?search=${encodeURIComponent(product.name)}`}>
-                              View Product
-                            </Link>
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-                <div className="mt-6">
-                  <Button variant="outline" asChild>
-                    <Link to="/catalog">More products</Link>
-                  </Button>
-                </div>
-              </div>
-            </section>
+            <ProductRecommendationsSection recommendations={healthSummary.recommendations} />
           )}
 
           {/* Your Recommended Action Plan Section */}
-          <section className="space-y-6">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Your Recommended Action Plan</h2>
-              <p className="text-gray-600">Personalized health improvement plans based on your lab results and metrics</p>
-            </div>
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                
-                {/* Healthy Nutrition Plan */}
-                <Card className="h-full flex flex-col hover:shadow-lg transition-all duration-200 hover:scale-105 bg-white border-green-200">
-                  <CardContent className="p-6 flex flex-col h-full">
-                    <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-4">
-                      <span className="text-2xl">🥗</span>
-                    </div>
-                    <h3 className="font-semibold text-lg mb-3 text-gray-900">Healthy Nutrition Plan</h3>
-                    <p className="text-sm text-gray-600 mb-4 leading-relaxed flex-1">
-                      A comprehensive nutrition guide tailored to your health metrics. Includes meal plans, portion control, and nutrient timing to optimize your biomarkers and energy levels.
-                    </p>
-                    <div className="flex items-center justify-between mt-auto">
-                      <span className="text-lg font-bold text-green-600">€49.99</span>
-                      <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                        Purchase Plan
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+          <ActionPlanSection />
 
-                {/* Cut Sugar & Carbs Plan */}
-                <Card className="h-full flex flex-col hover:shadow-lg transition-all duration-200 hover:scale-105 bg-white border-orange-200">
-                  <CardContent className="p-6 flex flex-col h-full">
-                    <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mb-4">
-                      <span className="text-2xl">🚫</span>
-                    </div>
-                    <h3 className="font-semibold text-lg mb-3 text-gray-900">Cut Sugar & Carbs</h3>
-                    <p className="text-sm text-gray-600 mb-4 leading-relaxed flex-1">
-                      Strategic carbohydrate reduction plan to improve insulin sensitivity and metabolic health. Perfect for addressing elevated glucose and triglyceride levels.
-                    </p>
-                    <div className="flex items-center justify-between mt-auto">
-                      <span className="text-lg font-bold text-orange-600">€39.99</span>
-                      <Button size="sm" className="bg-orange-600 hover:bg-orange-700">
-                        Purchase Plan
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Increase Testosterone Levels Plan */}
-                <Card className="h-full flex flex-col hover:shadow-lg transition-all duration-200 hover:scale-105 bg-white border-blue-200">
-                  <CardContent className="p-6 flex flex-col h-full">
-                    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                      <span className="text-2xl">💪</span>
-                    </div>
-                    <h3 className="font-semibold text-lg mb-3 text-gray-900">Increase Testosterone Levels</h3>
-                    <p className="text-sm text-gray-600 mb-4 leading-relaxed flex-1">
-                      Natural testosterone optimization through targeted nutrition, exercise protocols, and lifestyle modifications. Includes sleep optimization and stress management techniques.
-                    </p>
-                    <div className="flex items-center justify-between mt-auto">
-                      <span className="text-lg font-bold text-blue-600">€59.99</span>
-                      <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                        Purchase Plan
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-              </div>
-              <div className="mt-6">
-                <Button variant="outline" asChild>
-                  <Link to="/plans">View All Plans</Link>
-                </Button>
-              </div>
-            </div>
-          </section>
-
-          {/* Health Metrics Overview */}
-          <section className="space-y-6">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Health Metrics Overview</h2>
-              <p className="text-gray-600">Actionable insights based on your latest lab results</p>
-            </div>
-            
-            {/* Show "All is well" message when everything is normal */}
-            {healthSummary.alertLevel === 'good' ? (
-              <Card className="border-l-4 border-l-green-500 shadow-sm hover:shadow-md transition-shadow bg-gradient-to-r from-green-50 to-emerald-50">
-                <CardContent className="p-8 text-center">
-                  <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-                    <span className="text-4xl">✨</span>
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">All Your Health Metrics Look Great!</h3>
-                  <p className="text-gray-700 text-lg mb-6 max-w-2xl mx-auto">
-                    Congratulations! All {labResults.filter(r => new Date(r.date).getTime() === Math.max(...labResults.map(lr => new Date(lr.date).getTime()))).length} of your latest lab results are within normal ranges. 
-                    This indicates excellent overall health and that your current lifestyle choices are working well for you.
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mb-6">
-                    <div className="bg-white/60 rounded-lg p-4">
-                      <div className="text-3xl mb-2">❤️</div>
-                      <div className="font-semibold text-gray-900">Heart Health</div>
-                      <div className="text-sm text-gray-600">Cholesterol levels optimal</div>
-                    </div>
-                    <div className="bg-white/60 rounded-lg p-4">
-                      <div className="text-3xl mb-2">⚡</div>
-                      <div className="font-semibold text-gray-900">Energy & Metabolism</div>
-                      <div className="text-sm text-gray-600">Glucose & nutrients balanced</div>
-                    </div>
-                    <div className="bg-white/60 rounded-lg p-4">
-                      <div className="text-3xl mb-2">🛡️</div>
-                      <div className="font-semibold text-gray-900">Organ Function</div>
-                      <div className="text-sm text-gray-600">Kidney & liver working well</div>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap justify-center gap-3">
-                    <Button size="sm" variant="outline" onClick={handleChatWithAI} className="flex items-center gap-2">
-                      <span>💬</span>
-                      Chat with AI about maintaining health
-                    </Button>
-                    <Button size="sm" asChild className="bg-green-600 hover:bg-green-700">
-                      <Link to="/catalog" className="flex items-center gap-2">
-                        <span>🌿</span>
-                        Explore Wellness Products
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              /* Show detailed metrics when there are issues */
-              <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {healthMetrics.map((metric, index) => (
-                    <Card key={index} className="h-full flex flex-col border-0 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-white to-gray-50">
-                      <CardHeader className="pb-3 px-4 pt-4">
-                        <div className="flex justify-between items-start">
-                          <CardTitle className="text-sm font-semibold leading-tight text-gray-900">{metric.title}</CardTitle>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="px-4 pb-4 flex-1 flex flex-col">
-                        <div className="text-2xl font-bold mb-2 text-gray-900">{metric.value}</div>
-                        <div className={`text-sm font-medium mb-3 ${
-                          metric.color === 'green' ? 'text-green-600' :
-                          metric.color === 'yellow' ? 'text-yellow-600' :
-                          metric.color === 'orange' ? 'text-orange-600' :
-                          metric.color === 'red' ? 'text-red-600' : 'text-gray-600'
-                        }`}>
-                          {metric.status}
-                        </div>
-                        
-                        {/* Actionable Insight */}
-                        <div className="text-xs text-gray-600 mb-4 leading-relaxed flex-1">
-                          {metric.actionableInsight}
-                        </div>
-
-                        {/* Dynamic Trend Chart */}
-                        <div className="h-8 mb-4 relative">
-                          <svg className="w-full h-full" viewBox="0 0 100 32" preserveAspectRatio="none">
-                            {(() => {
-                              // Get historical data for this metric
-                              const metricData = labResults
-                                .filter(result => result.test === metric.title)
-                                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                                .map(result => parseFloat(result.result))
-                                .filter(val => !isNaN(val));
-
-                              if (metricData.length < 2) {
-                                // Fallback to static bars if not enough data
-                                const bars = [60, 70, 80, 85];
-                                return bars.map((height, index) => (
-                                  <rect
-                                    key={index}
-                                    x={index * 25}
-                                    y={32 - (height * 32 / 100)}
-                                    width="20"
-                                    height={height * 32 / 100}
-                                    className={`${
-                                      metric.color === 'green' ? 'fill-green-500' :
-                                      metric.color === 'yellow' ? 'fill-yellow-500' :
-                                      metric.color === 'orange' ? 'fill-orange-500' :
-                                      metric.color === 'red' ? 'fill-red-500' : 'fill-gray-500'
-                                    }`}
-                                    rx="1"
-                                  />
-                                ));
-                              }
-
-                              // Create trend line from actual data
-                              const minVal = Math.min(...metricData);
-                              const maxVal = Math.max(...metricData);
-                              const range = maxVal - minVal || 1;
-                              
-                              const points = metricData.map((val, index) => {
-                                const x = (index / (metricData.length - 1)) * 100;
-                                const y = 32 - ((val - minVal) / range * 24 + 4); // 4px padding top/bottom
-                                return `${x},${y}`;
-                              }).join(' ');
-
-                              return (
-                                <>
-                                  {/* Area under the curve */}
-                                  <polygon
-                                    points={`0,32 ${points} 100,32`}
-                                    className={`${
-                                      metric.color === 'green' ? 'fill-green-200' :
-                                      metric.color === 'yellow' ? 'fill-yellow-200' :
-                                      metric.color === 'orange' ? 'fill-orange-200' :
-                                      metric.color === 'red' ? 'fill-red-200' : 'fill-gray-200'
-                                    }`}
-                                    fillOpacity="0.3"
-                                  />
-                                  {/* Trend line */}
-                                  <polyline
-                                    points={points}
-                                    fill="none"
-                                    stroke={`${
-                                      metric.color === 'green' ? '#10b981' :
-                                      metric.color === 'yellow' ? '#f59e0b' :
-                                      metric.color === 'orange' ? '#f97316' :
-                                      metric.color === 'red' ? '#ef4444' : '#6b7280'
-                                    }`}
-                                    strokeWidth="2"
-                                    className="drop-shadow-sm"
-                                  />
-                                  {/* Data points */}
-                                  {metricData.map((val, index) => {
-                                    const x = (index / (metricData.length - 1)) * 100;
-                                    const y = 32 - ((val - minVal) / range * 24 + 4);
-                                    return (
-                                      <circle
-                                        key={index}
-                                        cx={x}
-                                        cy={y}
-                                        r="2"
-                                        className={`${
-                                          metric.color === 'green' ? 'fill-green-500' :
-                                          metric.color === 'yellow' ? 'fill-yellow-500' :
-                                          metric.color === 'orange' ? 'fill-orange-500' :
-                                          metric.color === 'red' ? 'fill-red-500' : 'fill-gray-500'
-                                        }`}
-                                      />
-                                    );
-                                  })}
-                                </>
-                              );
-                            })()}
-                          </svg>
-                        </div>
-
-                        {/* Trend Indicator */}
-                        <div className="flex items-center justify-center mb-4">
-                          <span className={`text-xs font-medium flex items-center px-3 py-1 rounded-full ${
-                            metric.trendDirection === 'up' ? 'text-green-700 bg-green-100' : 
-                            metric.trendDirection === 'down' ? 'text-red-700 bg-red-100' : 'text-gray-700 bg-gray-100'
-                          }`}>
-                            {metric.trendDirection === 'up' ? '↗️' : 
-                             metric.trendDirection === 'down' ? '↘️' : '➡️'} {metric.trend}
-                          </span>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="space-y-3 mt-auto">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="w-full text-xs h-8 text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300 font-medium"
-                            onClick={() => handleDiscussMetricWithAI(metric)}
-                          >
-                            💬 Discuss with AI
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            )}
-          </section>
+ {/* Health Metrics Overview */}
+          <HealthMetricsOverviewSection 
+            healthSummary={healthSummary}
+            healthMetrics={healthMetrics}
+            labResults={labResults}
+            onChatWithAI={handleChatWithAI}
+            onDiscussMetricWithAI={handleDiscussMetricWithAI}
+          />
 
           {/* Lab Results Section */}
-          <section className="space-y-6">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Lab Results History</h2>
-              <p className="text-gray-600">Complete history of your laboratory test results</p>
-            </div>
-            <Card className="shadow-sm border-gray-100">
-              <CardHeader className="border-b border-gray-100 bg-gray-50/50">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle className="text-xl font-semibold text-gray-900">Test Results</CardTitle>
-                    <p className="text-gray-600 text-sm mt-1">Upload new results or view historical data</p>
-                  </div>
-                  <div className="flex gap-3">
-                    <LabUpload onResultsAdded={handleLabResultsAdded} />
-                    <Button variant="outline" size="sm" className="flex items-center gap-2">
-                      <span>➕</span>
-                      Add Manual Result
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  {groupedLabResults.map((dateGroup) => {
-                    const isExpanded = expandedAccordions.includes(dateGroup.date);
-                    return (
-                      <Card key={dateGroup.date} className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                        <CardHeader 
-                          className="cursor-pointer hover:bg-gray-50 transition-colors p-4"
-                          onClick={() => toggleAccordion(dateGroup.date)}
-                        >
-                          <div className="flex justify-between items-center">
-                            <div className="flex items-center space-x-4">
-                              <div>
-                                <h3 className="font-semibold text-lg text-gray-900">{dateGroup.date}</h3>
-                                <p className="text-sm text-gray-600">{dateGroup.totalTests} test{dateGroup.totalTests !== 1 ? 's' : ''}</p>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                              <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(dateGroup.overallStatus)}`}>
-                                {dateGroup.statusText}
-                              </span>
-                              <svg 
-                                className={`w-5 h-5 text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
-                                fill="none" 
-                                stroke="currentColor" 
-                                viewBox="0 0 24 24"
-                              >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                              </svg>
-                            </div>
-                          </div>
-                        </CardHeader>
-                        {isExpanded && (
-                          <CardContent className="pt-0 p-4">
-                            <div className="overflow-x-auto">
-                              <table className="w-full">
-                                <thead>
-                                  <tr className="border-b border-gray-200">
-                                    <th className="text-left py-3 text-sm font-semibold text-gray-900">Test</th>
-                                    <th className="text-left py-3 text-sm font-semibold text-gray-900">Result</th>
-                                    <th className="text-left py-3 text-sm font-semibold text-gray-900">Reference Range</th>
-                                    <th className="text-left py-3 text-sm font-semibold text-gray-900">Status</th>
-                                    <th className="text-left py-3 text-sm font-semibold text-gray-900">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200">
-                                  {dateGroup.results.map((result, index) => (
-                                    <tr key={result.id || index} className="hover:bg-gray-50">
-                                      <td className="py-3 text-sm text-gray-900 font-medium">{result.test}</td>
-                                      <td className="py-3 text-sm font-semibold text-gray-900">{result.result}</td>
-                                      <td className="py-3 text-sm text-gray-600">{result.referenceRange}</td>
-                                      <td className="py-3">
-                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(result.status)}`}>
-                                          {result.status}
-                                        </span>
-                                      </td>
-                                      <td className="py-3">
-                                        {result.id && (
-                                          <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => handleDeleteLabResult(result.id!)}
-                                            className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-                                          >
-                                            <Trash2 className="h-4 w-4" />
-                                          </Button>
-                                        )}
-                                      </td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          </CardContent>
-                        )}
-                      </Card>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-          </section>
+          <LabResultsSection 
+            groupedLabResults={groupedLabResults}
+            expandedAccordions={expandedAccordions}
+            onLabResultsAdded={handleLabResultsAdded}
+            onToggleAccordion={toggleAccordion}
+            onDeleteLabResult={handleDeleteLabResult}
+            onDeleteDateGroup={handleDeleteDateGroup}
+            getStatusColor={getStatusColor}
+          />
         </div>
 
         {/* Chat Panel - Right Side */}
-        <div className="xl:col-span-1">
-          <div className="fixed bottom-4 right-4 xl:fixed xl:bottom-4 xl:right-4 xl:w-80">
-            <Card className={`w-80 xl:w-80 flex flex-col shadow-lg border-gray-200 transition-all duration-300 ${
-              isChatMinimized ? 'h-14' : 'h-[700px]'
-            }`}>
-              <CardHeader className="flex-shrink-0 border-b border-gray-100 p-4 bg-gradient-to-r from-blue-50 to-indigo-50">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                      🤖 AI Health Assistant
-                    </CardTitle>
-                    {!isChatMinimized && (
-                      <p className="text-sm text-gray-600 mt-1">Get instant insights about your health data</p>
-                    )}
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsChatMinimized(!isChatMinimized)}
-                    className="h-8 w-8 p-0 hover:bg-white/50"
-                  >
-                    {isChatMinimized ? (
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                      </svg>
-                    ) : (
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    )}
-                  </Button>
-                </div>
-              </CardHeader>
-            
-            {!isChatMinimized && (
-              <>
-                {/* Chat Messages */}
-                <CardContent className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/30">
-                  {chatMessages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-[85%] rounded-lg px-4 py-2 text-sm shadow-sm ${
-                          message.isUser
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-white text-gray-900 border border-gray-200'
-                        }`}
-                      >
-                        {message.text}
-                      </div>
-                    </div>
-                  ))}
-                  {isTyping && (
-                    <div className="flex justify-start">
-                      <div className="bg-white text-gray-900 rounded-lg px-4 py-2 text-sm border border-gray-200 shadow-sm">
-                        <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  <div ref={chatEndRef} />
-                </CardContent>
-
-                {/* Chat Input */}
-                <div className="flex-shrink-0 border-t border-gray-100 p-4 bg-white">
-                  <div className="flex space-x-2">
-                    <Input
-                      value={chatInput}
-                      onChange={(e) => setChatInput(e.target.value)}
-                      placeholder="Ask about your health results..."
-                      className="flex-1 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSendMessage();
-                        }
-                      }}
-                    />
-                    <Button 
-                      onClick={handleSendMessage}
-                      disabled={!chatInput.trim() || isTyping}
-                      size="sm"
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      Send
-                    </Button>
-                  </div>
-                </div>
-              </>
-            )}
-            </Card>
-          </div>
-        </div>
+        <ChatPanel 
+          isChatMinimized={isChatMinimized}
+          chatMessages={chatMessages}
+          chatInput={chatInput}
+          isTyping={isTyping}
+          onToggleMinimized={() => setIsChatMinimized(!isChatMinimized)}
+          onChatInputChange={setChatInput}
+          onSendMessage={handleSendMessage}
+        />
       </div>
     </div>
   </Page>

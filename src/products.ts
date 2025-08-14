@@ -209,6 +209,168 @@ export const products: Product[] = [
     "price": "7,24 €",
     "description": null,
     "image_url": "https://apteekki360.fi/cdn/shop/products/apteekki-360-otrivin-sailytysaineeton-05-mgml-nenasumute-liuos-433136-668807.jpg?v=1746476353&width=1080"
+  },
+  {
+    "name": "Sideral Forte 30mg",
+    "price": "16,80 €",
+    "description": "Sideral Forte on suun kautta nautittava rautavalmiste, joka on suunniteltu niille, jotka kaipaavat helposti imeytyvää rautalisää. Valmiste yhdistää sukrosomiaalisen raudan ja C-vitamiinin, jotta raudan imeytyminen olisi mahdollisimman tehokasta. Tämä rauta on pehmeä vatsalle ja sopii hyvin niille, jotka eivät yleensä siedä tavanomaisia rautatuotteita.\n\nSisältää sukrosomiaalisesti suojattua rautaa\nParannettu imeytyvyys ohutsuolessa\nYhdistetty C-vitamiini tukemaan imeytymistä\nYstävällinen vatsalle\n\nJos olet etsinyt rautalisää, joka ei rasita vatsaasi, Sideral Forte voi olla juuri se, mitä tarvitset. Sen ainutlaatuinen koostumus auttaa sinua saamaan raudasta kaiken irti ilman tavallisia sivuvaikutuksia. Kokeile ja huomaa itse ero. Ota askel kohti parempaa hyvinvointia jo tänään!",
+    "image_url": "https://apteekki360.fi/cdn/shop/products/apteekki-360-sideral-forte-30mg-9287858-997250_1024x1024.png?v=1746472607"
+  },
+  {
+    "name": "Priorin Extra, 180 Kaps",
+    "price": "64,90 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/files/apteekki-360-priorin-extra-180-kaps-2211514-802940.png?v=1746473135&width=1080"
+  },
+  {
+    "name": "Minisun Multivitamin Mama (raskaus & imetys)",
+    "price": "11,90 €",
+    "description": "Minisun Multivitamin Mama on suunniteltu suomalaisiin suosituksiin perustuen, ja se tukee naisten hyvinvointia raskauden ja imetyksen aikana. Tuote sisältää tärkeät vitamiinit ja hivenaineet, mukaan lukien foolihapon, D-vitamiinin ja raudan, jotka ovat tärkeitä äidin ja kehittyvän vauvan tarpeisiin. Yhdellä päivittäisellä tabletilla saat helposti kaikki tärkeät ravintoaineet ilman lisättyjä makeutusaineita.\n\n\u00a0 \u00a0 Sisältää 17 eri vitamiinia ja hivenainetta\n\u00a0 \u00a0 Mukana suositusten mukainen annos foolihappoa\n\u00a0 \u00a0 Ei sisällä A-vitamiinia\n\u00a0 \u00a0 Laktoositon, maidoton, soijaton, gluteeniton, liivatteeton ja hiivaton\n\u00a0 \u00a0 Helposti nieltävä ja pienikokoinen tabletti\n\nPidä huolta itsestäsi ja tulevasta lapsestasi - valitse Minisun Multivitamin Mama osaksi päivittäistä rutiiniasi.",
+    "image_url": "https://apteekki360.fi/cdn/shop/products/apteekki-360-minisun-multivitamin-mama-raskaus-imetys-2071660-468081_1024x1024.png?v=1746474429"
+  },
+  {
+    "name": "Sideral Folic 30mg",
+    "price": "18,70 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-sideral-folic-30mg-9287847-121355.png?v=1746472608&width=1080"
+  },
+  {
+    "name": "Biogaia Drops+D3 maitohappobakteeri",
+    "price": "12,67 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-biogaia-dropsd3-maitohappobakteeri-9503268-590264.jpg?v=1746473572&width=1080"
+  },
+  {
+    "name": "Puhdas+ Beauty Kollageeni & Biotiini",
+    "price": "18,76 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-puhdas-beauty-kollageeni-biotiini-333505-606041.jpg?v=1746472905&width=1080"
+  },
+  {
+    "name": "Multivita Plus Monivitamiini",
+    "price": "alk. 4,00 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-multivita-plus-monivitamiini-9252130-119649.jpg?v=1746472891&width=1080"
+  },
+  {
+    "name": "Ferrodan Fe2+ 100 mg",
+    "price": "alk. 6,30 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/files/apteekki-360-ferrodan-fe2-100-mg-9104405-275084.jpg?v=1746472545&width=1080"
+  },
+  {
+    "name": "Puhdas+ Biotiini 10.000 ug",
+    "price": "11,22 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-puhdas-biotiini-10000-ug-335573-812143.jpg?v=1746472904&width=1080"
+  },
+  {
+    "name": "Puhdistamo Athletics Kreatiini 250 G",
+    "price": "8,99 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-puhdistamo-athletics-kreatiini-250-g-20006624-377789.png?v=1746472128&width=1080"
+  },
+  {
+    "name": "Bertils Testo Boost",
+    "price": "12,50 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-bertils-testo-boost-9287209-870880.jpg?v=1746473677&width=1080"
+  },
+  {
+    "name": "Multivita Raskaus Ja Imetys Monivitamiini",
+    "price": "12,72 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-multivita-raskaus-ja-imetys-monivitamiini-9251954-697288.jpg?v=1746472795&width=1080"
+  },
+  {
+    "name": "Priorin Extra, 60 Kaps",
+    "price": "29,19 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/files/apteekki-360-priorin-extra-60-kaps-2211365-716794.png?v=1746471870&width=1080"
+  },
+  {
+    "name": "Bioteekki Super Biotiini (+Metioniini) 5500 ug",
+    "price": "8,70 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/files/apteekki-360-bioteekki-super-biotiini-metioniini-5500-ug-2374445-613392.webp?v=1746472606&width=1080"
+  },
+  {
+    "name": "Puhdas+ Vahva Kurkumiini + Bioperine 250mg",
+    "price": "22,65 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-puhdas-vahva-kurkumiini-bioperine-250mg-341995-173699.webp?v=1746472418&width=1080"
+  },
+  {
+    "name": "Puhdas+ Vahva Ashwagandha + Bioperine 150mg",
+    "price": "alk. 8,90 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-puhdas-vahva-ashwagandha-bioperine-150mg-342003-604404.webp?v=1746472422&width=1080"
+  },
+  {
+    "name": "Omega7 Tyrniöljy",
+    "price": "alk. 19,50 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/files/apteekki-360-omega7-tyrnioljy-9256750-695168.png?v=1746473099&width=1080"
+  },
+  {
+    "name": "Minisun Monivitamiini Vahva",
+    "price": "14,90 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-minisun-monivitamiini-vahva-2108546-829642.png?v=1746474392&width=1080"
+  },
+  {
+    "name": "Nivelactive",
+    "price": "alk. 13,90 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-nivelactive-9256684-668251.png?v=1746473096&width=1080"
+  },
+  {
+    "name": "Puhdas+ Quattro Magnesium",
+    "price": "8,76 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/files/apteekki-360-puhdas-quattro-magnesium-339638-657108.webp?v=1746472897&width=1080"
+  },
+  {
+    "name": "DeviSol 20 mcg - D-vitamiini",
+    "price": "alk. 8,51 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-devisol-20-mcg-d-vitamiini-9252394-404193.jpg?v=1746474572&width=1080"
+  },
+  {
+    "name": "DeviSol Strong 50 mcg - D-vitamiini",
+    "price": "alk. 11,25 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/files/apteekki-360-devisol-strong-50-mcg-d-vitamiini-9254011-577544.webp?v=1746472893&width=1080"
+  },
+  {
+    "name": "Biotin Strong  60 + 30 tabl. kampanjapakkaus",
+    "price": "10,99 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-biotin-strong-60-30-tabl-kampanjapakkaus-9104026-994451.png?v=1748936179&width=1080"
+  },
+  {
+    "name": "Multivita Omegalive Strong",
+    "price": "16,04 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-multivita-omegalive-strong-9252119-739514.jpg?v=1746472886&width=1080"
+  },
+  {
+    "name": "Priorin Extra, 120 Kaps",
+    "price": "55,37 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-priorin-extra-120-kaps-2211217-342322.jpg?v=1746471580&width=1080"
+  },
+  {
+    "name": "Minisun Multivitamin Junior Tähtimarja",
+    "price": "alk. 8,44 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-minisun-multivitamin-junior-tahtimarja-2119469-640398.png?v=1746474392&width=1080"
+  },
+  {
+    "name": "Biorion Strong 5 mg",
+    "price": "24,79 €",
+    "description": null,
+    "image_url": "//apteekki360.fi/cdn/shop/products/apteekki-360-biorion-strong-5-mg-9522870-542202.jpg?v=1746471459&width=1080"
   }
 ];
 
