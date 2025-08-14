@@ -54,7 +54,18 @@ const Page: React.FC<PageProps> = ({
                     location.pathname === '/dashboard' && "text-purple-600 font-medium"
                   )}
                 >
-                  Dashboard
+                  My Dashboard
+                </Link>
+              )}
+              {isAuthenticated && (
+                <Link 
+                  to="/plan" 
+                  className={cn(
+                    "text-gray-600 hover:text-purple-600 transition-colors",
+                    location.pathname === '/plan' && "text-purple-600 font-medium"
+                  )}
+                >
+                  My Plan
                 </Link>
               )}
               <Link 

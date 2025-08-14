@@ -4,6 +4,7 @@ import Chat from './features/chat/Chat';
 import Recommendations from './features/recommendations/Recommendations';
 import Auth from './features/auth/Auth';
 import Dashboard from './features/dashboard/Dashboard';
+import Plan from './features/plan/Plan';
 import Booking from './features/booking/Booking';
 import Catalog from './features/catalog/Catalog';
 import Insights from './features/insights/Insights';
@@ -28,6 +29,11 @@ function App() {
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/plan" element={
+            <ProtectedRoute>
+              <Plan />
             </ProtectedRoute>
           } />
           <Route path="/booking" element={<Booking />} />
