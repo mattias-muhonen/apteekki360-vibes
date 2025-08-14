@@ -4,6 +4,7 @@ import { Button, Card, CardContent } from '../../../components/ui';
 import OpenAI from 'openai';
 import { plans } from '../../../plans';
 import type { Plan } from '../../../plans';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface LabEntry {
   date: string;
@@ -21,6 +22,7 @@ interface ActionPlanSectionProps {
 const ActionPlanSection: React.FC<ActionPlanSectionProps> = ({
   labResults = []
 }) => {
+  const { t } = useLanguage();
   const [aiRecommendedPlans, setAiRecommendedPlans] = useState<Plan[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -179,11 +181,11 @@ Respond with only the exact plan titles, one per line, no additional text or for
   return (
     <section className="space-y-6">
       <div className="space-y-2">
-        <h2 className="text-2xl font-bold text-gray-900">Your Recommended Action Plan</h2>
+        <h2 className="text-2xl font-bold text-gray-900">{t('action_plans.title')}</h2>
         <p className="text-gray-600">
           {abnormalLabResults.length > 0 
-            ? `AI-selected plans based on your lab results that need attention`
-            : 'Personalized health improvement plans based on your lab results and metrics'
+            ? t('action_plans.personalized_subtitle')
+            : t('action_plans.general_subtitle')
           }
         </p>
       </div>
@@ -192,7 +194,7 @@ Respond with only the exact plan titles, one per line, no additional text or for
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6">
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-            <span className="ml-3 text-gray-600">Getting personalized plan recommendations...</span>
+            <span className="ml-3 text-gray-600">{t('action_plans.loading')}</span>
           </div>
         </div>
       )}
@@ -221,7 +223,7 @@ Respond with only the exact plan titles, one per line, no additional text or for
                     <div className="flex items-center justify-between mt-auto">
                       <span className={`text-lg font-bold ${colors.text}`}>{plan.price}</span>
                       <Button size="sm" className={`${colors.bg.replace('bg-', 'bg-').replace('-100', '-600')} hover:${colors.bg.replace('bg-', 'bg-').replace('-100', '-700')}`}>
-                        Purchase Plan
+                        {t('action_plans.purchase')}
                       </Button>
                     </div>
                   </CardContent>
@@ -231,7 +233,7 @@ Respond with only the exact plan titles, one per line, no additional text or for
           </div>
           <div className="mt-6">
             <Button variant="outline" asChild>
-              <Link to="/plans">View All Plans</Link>
+              <Link to="/plans">{t('action_plans.view_all')}</Link>
             </Button>
           </div>
         </div>

@@ -14,31 +14,34 @@ import Stories from './features/stories/Stories';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/recommendations" element={<Recommendations />} />
-          <Route path="/stories" element={<Stories />} />
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/booking" element={<Booking />} />
-          <Route path="/catalog" element={<Catalog />} />
-          <Route path="/insights" element={<Insights />} />
-          <Route path="/confirmation" element={<Confirmation />} />
-          <Route path="/tiers" element={<Tiers />} />
-          <Route path="/auth" element={<Auth />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+    <LanguageProvider>
+      <AuthProvider>
+        <Router>
+          <ScrollToTop />
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/recommendations" element={<Recommendations />} />
+            <Route path="/stories" element={<Stories />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/booking" element={<Booking />} />
+            <Route path="/catalog" element={<Catalog />} />
+            <Route path="/insights" element={<Insights />} />
+            <Route path="/confirmation" element={<Confirmation />} />
+            <Route path="/tiers" element={<Tiers />} />
+            <Route path="/auth" element={<Auth />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }
 

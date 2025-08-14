@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from './ui';
 import { cn } from '../lib/utils';
 
@@ -21,6 +22,7 @@ const Page: React.FC<PageProps> = ({
 }) => {
   const location = useLocation();
   const { isAuthenticated, logout, user } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
 
   const handleLogout = () => {
     logout();
@@ -44,7 +46,7 @@ const Page: React.FC<PageProps> = ({
                   location.pathname === '/chat' && "text-purple-600 font-medium"
                 )}
               >
-                Assessment
+                {t('nav.assessment')}
               </Link>
               {isAuthenticated && (
                 <Link 
@@ -54,7 +56,7 @@ const Page: React.FC<PageProps> = ({
                     location.pathname === '/dashboard' && "text-purple-600 font-medium"
                   )}
                 >
-                  Dashboard
+                  {t('nav.dashboard')}
                 </Link>
               )}
               <Link 
@@ -64,7 +66,7 @@ const Page: React.FC<PageProps> = ({
                   location.pathname === '/stories' && "text-purple-600 font-medium"
                 )}
               >
-                Stories
+                {t('nav.stories')}
               </Link>
               <Link 
                 to="/catalog" 
@@ -73,7 +75,7 @@ const Page: React.FC<PageProps> = ({
                   location.pathname === '/catalog' && "text-purple-600 font-medium"
                 )}
               >
-                Products
+                {t('nav.products')}
               </Link>
               <Link 
                 to="/booking" 
@@ -82,19 +84,42 @@ const Page: React.FC<PageProps> = ({
                   location.pathname === '/booking' && "text-purple-600 font-medium"
                 )}
               >
-                Book Test
+                {t('nav.book_test')}
               </Link>
+              
+              {/* Language Selector */}
+              <div className="flex items-center space-x-2 border-l pl-4 ml-4">
+                <button
+                  onClick={() => setLanguage('en')}
+                  className={cn(
+                    "px-2 py-1 text-sm rounded transition-colors",
+                    language === 'en' ? "bg-purple-100 text-purple-700 font-medium" : "text-gray-600 hover:text-purple-600"
+                  )}
+                >
+                  EN
+                </button>
+                <button
+                  onClick={() => setLanguage('fi')}
+                  className={cn(
+                    "px-2 py-1 text-sm rounded transition-colors",
+                    language === 'fi' ? "bg-purple-100 text-purple-700 font-medium" : "text-gray-600 hover:text-purple-600"
+                  )}
+                >
+                  FI
+                </button>
+              </div>
+
               {isAuthenticated ? (
                 <div className="flex items-center space-x-4">
-                  <span className="text-sm text-gray-600">Welcome, {user?.name}</span>
+                  <span className="text-sm text-gray-600">{t('nav.welcome')}, {user?.name}</span>
                   <Button onClick={handleLogout} variant="outline" size="sm">
-                    Logout
+                    {t('nav.logout')}
                   </Button>
                 </div>
               ) : (
                 <Button asChild>
                   <Link to="/auth">
-                    Login
+                    {t('nav.login')}
                   </Link>
                 </Button>
               )}

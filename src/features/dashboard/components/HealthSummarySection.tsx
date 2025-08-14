@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button, Card, CardContent, CardHeader, CardTitle } from '../../../components/ui';
 import LabUpload from '../../lab-upload/LabUpload';
 import OpenAI from 'openai';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface LabResult {
   test: string;
@@ -45,6 +46,7 @@ const HealthSummarySection: React.FC<HealthSummarySectionProps> = ({
   onChatWithAI,
   labResults = []
 }) => {
+  const { t } = useLanguage();
   const [bloodPanelRecommendation, setBloodPanelRecommendation] = useState<BloodPanelRecommendation | null>(null);
   const [isLoadingRecommendation, setIsLoadingRecommendation] = useState(false);
   const [showRecommendation, setShowRecommendation] = useState(false);
@@ -141,8 +143,8 @@ Make the panel name specific and medical-sounding, not generic. Include 5 key te
   return (
     <section className="space-y-6">
       <div className="space-y-2">
-        <h2 className="text-2xl font-bold text-gray-900">Health Summary</h2>
-        <p className="text-gray-600">Your current health status at a glance</p>
+        <h2 className="text-2xl font-bold text-gray-900">{t('health_summary.title')}</h2>
+        <p className="text-gray-600">{t('health_summary.subtitle')}</p>
       </div>
       <Card className={`border-l-4 shadow-sm hover:shadow-md transition-shadow ${
         healthSummary.alertLevel === 'good' ? 'border-l-green-500' :
@@ -170,8 +172,8 @@ Make the panel name specific and medical-sounding, not generic. Include 5 key te
               </span>
             </div>
             <div>
-              <CardTitle className="text-xl font-semibold text-gray-900">Overall Health Status</CardTitle>
-              <p className="text-gray-600 text-sm mt-1">Based on your latest lab results</p>
+              <CardTitle className="text-xl font-semibold text-gray-900">{t('health_summary.overall_health')}</CardTitle>
+              <p className="text-gray-600 text-sm mt-1">{t('health_summary.based_on_labs')}</p>
             </div>
           </div>
         </CardHeader>
@@ -182,7 +184,7 @@ Make the panel name specific and medical-sounding, not generic. Include 5 key te
             {healthSummary.alertLevel !== 'no-data' && (
               <Button size="sm" variant="outline" onClick={onChatWithAI} className="flex items-center gap-2">
                 <span>💬</span>
-                Chat with AI about your results
+                {t('health_summary.chat_ai')}
               </Button>
             )}
             {hasAbnormalResults && bloodPanelRecommendation && (
@@ -193,20 +195,20 @@ Make the panel name specific and medical-sounding, not generic. Include 5 key te
                 onClick={() => setShowRecommendation(!showRecommendation)}
               >
                 <span>🩸</span>
-                {showRecommendation ? 'Hide' : 'View'} Recommended Blood Panel
+                {showRecommendation ? t('health_summary.hide_blood_panel') : t('health_summary.view_blood_panel')}
               </Button>
             )}
             {hasAbnormalResults && isLoadingRecommendation && (
               <Button size="sm" variant="outline" disabled className="flex items-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                Getting recommendation...
+                {t('health_summary.getting_recommendation')}
               </Button>
             )}
             {healthSummary.alertLevel !== 'good' && healthSummary.alertLevel !== 'no-data' && (
               <Button size="sm" asChild>
                 <Link to="/booking" className="flex items-center gap-2">
                   <span>📅</span>
-                  Book Consultation
+                  {t('health_summary.book_consultation')}
                 </Link>
               </Button>
             )}
@@ -229,7 +231,7 @@ Make the panel name specific and medical-sounding, not generic. Include 5 key te
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-2">Key Tests Included:</h4>
+                      <h4 className="font-medium text-gray-900 mb-2">{t('health_summary.key_tests')}</h4>
                       <ul className="space-y-1">
                         {bloodPanelRecommendation.keyTests.map((test, index) => (
                           <li key={index} className="text-sm text-gray-600 flex items-center gap-2">
@@ -241,7 +243,7 @@ Make the panel name specific and medical-sounding, not generic. Include 5 key te
                     </div>
                     
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-2">Benefits:</h4>
+                      <h4 className="font-medium text-gray-900 mb-2">{t('health_summary.benefits')}</h4>
                       <ul className="space-y-1">
                         {bloodPanelRecommendation.benefits.map((benefit, index) => (
                           <li key={index} className="text-sm text-gray-600 flex items-center gap-2">
@@ -256,10 +258,10 @@ Make the panel name specific and medical-sounding, not generic. Include 5 key te
                   <div className="flex items-center justify-between pt-4 border-t border-blue-200">
                     <div className="flex items-center gap-4">
                       <span className="text-2xl font-bold text-blue-600">{bloodPanelRecommendation.price}</span>
-                      <span className="text-sm text-gray-600">Recommended: {bloodPanelRecommendation.frequency}</span>
+                      <span className="text-sm text-gray-600">{t('health_summary.recommended')}: {bloodPanelRecommendation.frequency}</span>
                     </div>
                     <Button className="bg-blue-600 hover:bg-blue-700">
-                      Book This Panel
+                      {t('health_summary.book_panel')}
                     </Button>
                   </div>
                 </CardContent>

@@ -5,6 +5,7 @@ import type { Product } from '../../../products';
 import { products } from '../../../products';
 import type { LabEntry } from '../../../services/openai';
 import OpenAI from 'openai';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface ProductRecommendationsSectionProps {
   recommendations: Product[];
@@ -15,6 +16,7 @@ const ProductRecommendationsSection: React.FC<ProductRecommendationsSectionProps
   recommendations,
   labResults = []
 }) => {
+  const { t } = useLanguage();
   const [aiRecommendedProducts, setAiRecommendedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -177,9 +179,9 @@ Respond with only the exact product names, one per line, no additional text or f
 
   // Create blood test monitoring recommendation
   const bloodTestRecommendation: Product = {
-    name: "Blood Test Monitoring",
-    price: "From 49,90 €",
-    description: "Regular blood work monitoring is essential for tracking your health progress and catching potential issues early. Schedule comprehensive testing every 6-12 months to maintain optimal health.",
+    name: t('recommendations.blood_test_monitoring'),
+    price: t('recommendations.blood_test_price'),
+    description: t('recommendations.blood_test_description'),
     image_url: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=400&fit=crop&auto=format"
   };
 
@@ -215,12 +217,12 @@ Respond with only the exact product names, one per line, no additional text or f
     <section className="space-y-6">
       <div className="space-y-2">
         <h2 className="text-2xl font-bold text-gray-900">
-          {abnormalLabResults.length > 0 ? 'Personalized Recommendations' : 'Recommended for You'}
+          {abnormalLabResults.length > 0 ? t('recommendations.personalized_title') : t('recommendations.general_title')}
         </h2>
         <p className="text-gray-600">
           {abnormalLabResults.length > 0 
-            ? `AI-selected products based on your lab results that need attention`
-            : 'Personalized product suggestions based on your health metrics'
+            ? t('recommendations.personalized_subtitle')
+            : t('recommendations.general_subtitle')
           }
         </p>
       </div>
@@ -229,7 +231,7 @@ Respond with only the exact product names, one per line, no additional text or f
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6">
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-3 text-gray-600">Getting personalized recommendations...</span>
+            <span className="ml-3 text-gray-600">{t('recommendations.loading')}</span>
           </div>
         </div>
       )}
@@ -269,7 +271,7 @@ Respond with only the exact product names, one per line, no additional text or f
               {showBasedOnInfo && (
                 <div className="info-tooltip absolute bottom-16 right-4 bg-white p-4 rounded-lg shadow-xl border border-gray-200 z-20 max-w-xs">
                   <div className="text-sm">
-                    <div className="font-semibold text-gray-800 mb-2">Recommendations based on:</div>
+                    <div className="font-semibold text-gray-800 mb-2">{t('recommendations.based_on_label')}:</div>
                     <div className="text-gray-600 space-y-1">
                       {abnormalLabResults.map((result, index) => (
                         <div key={index} className="flex justify-between">
@@ -310,19 +312,19 @@ Respond with only the exact product names, one per line, no additional text or f
                   <p className="text-xs text-gray-600 mb-3 line-clamp-3 leading-relaxed flex-1">
                     {product.description ? 
                       product.description.substring(0, 120) + '...' : 
-                      'Quality health product to support your wellness journey'
+                      t('recommendations.default_description')
                     }
                   </p>
                   <div className="flex items-center justify-between mt-auto">
                     <span className="text-lg font-bold text-green-600">{product.price}</span>
-                    {product.name === "Blood Test Monitoring" ? (
+                    {product.name === t('recommendations.blood_test_monitoring') ? (
                       <Button size="sm" variant="outline" className="bg-blue-50 border-blue-200 hover:bg-blue-100">
-                        Schedule Test
+                        {t('recommendations.schedule_test')}
                       </Button>
                     ) : (
                       <Button size="sm" variant="outline" asChild>
                         <Link to={`/catalog?search=${encodeURIComponent(product.name)}`}>
-                          View Product
+                          {t('recommendations.view_product')}
                         </Link>
                       </Button>
                     )}
@@ -334,15 +336,15 @@ Respond with only the exact product names, one per line, no additional text or f
           <div className="mt-6">
             {!showMoreProducts && hasMoreProducts ? (
               <Button variant="outline" onClick={handleShowMoreProducts}>
-                More recommendations
+                {t('recommendations.more')}
               </Button>
             ) : showMoreProducts ? (
               <Button variant="outline" onClick={() => setShowMoreProducts(false)}>
-                Show less
+                {t('recommendations.show_less')}
               </Button>
             ) : (
               <Button variant="outline" asChild>
-                <Link to="/catalog">Browse catalog</Link>
+                <Link to="/catalog">{t('recommendations.browse_catalog')}</Link>
               </Button>
             )}
           </div>
