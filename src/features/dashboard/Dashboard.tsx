@@ -543,6 +543,7 @@ const Dashboard = () => {
             healthSummary={healthSummary}
             onLabResultsAdded={handleLabResultsAdded}
             onChatWithAI={handleChatWithAI}
+            labResults={labResults}
           />
 
           {/* Product Recommendations Section */}

@@ -26,13 +26,18 @@ interface HealthSummarySectionProps {
   healthSummary: HealthSummary;
   onLabResultsAdded: (results: ProcessedResults) => void;
   onChatWithAI: () => void;
+  labResults?: LabResult[];
 }
 
 const HealthSummarySection: React.FC<HealthSummarySectionProps> = ({
   healthSummary,
   onLabResultsAdded,
-  onChatWithAI
+  onChatWithAI,
+  labResults = []
 }) => {
+  // Check if there are any abnormal results
+  const hasAbnormalResults = labResults.some(result => result.status !== 'Normal');
+
   return (
     <section className="space-y-6">
       <div className="space-y-2">
@@ -78,6 +83,12 @@ const HealthSummarySection: React.FC<HealthSummarySectionProps> = ({
               <Button size="sm" variant="outline" onClick={onChatWithAI} className="flex items-center gap-2">
                 <span>💬</span>
                 Chat with AI about your results
+              </Button>
+            )}
+            {hasAbnormalResults && (
+              <Button size="sm" variant="default" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700">
+                <span>🩸</span>
+                Book Blood Test for Monitoring
               </Button>
             )}
             {healthSummary.alertLevel !== 'good' && healthSummary.alertLevel !== 'no-data' && (
