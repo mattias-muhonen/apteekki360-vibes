@@ -24,7 +24,7 @@
     "description": "A plan to support cognitive function and emotional balance. This includes two blood tests to analyze markers related to brain health (e.g., neurotransmitter precursors, thyroid function), and a consultation with a professional to develop a personalized approach to improve your focus and mood.",
     "price": "319 €"
   },
-  {
+  { 
     "title": "Performance Plan",
     "description": "An advanced plan for athletes and fitness enthusiasts looking to optimize their physical performance. It includes two blood tests to measure relevant markers (e.g., testosterone, cortisol, creatine kinase), and a professional consultation to fine-tune your training and recovery protocols.",
     "price": "449 €"

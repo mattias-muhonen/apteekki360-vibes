@@ -37,20 +37,7 @@ interface LabEntry {
   id?: string; // Add unique identifier for deletion
 }
 
-interface HealthMetric {
-  title: string;
-  value: string;
-  status: string;
-  trend: string;
-  trendDirection: 'up' | 'down' | 'stable';
-  color: string;
-  chartHeight: number[];
-  actionableInsight: string;
-  actionButton?: {
-    text: string;
-    action: string;
-  };
-}
+
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -105,166 +92,6 @@ const Dashboard = () => {
       setLabResults(filteredResults);
     }
   };
-
-  // Calculate dynamic health metrics based on lab results
-  const healthMetrics = useMemo(() => {
-    const metrics: HealthMetric[] = [];
-    
-    // Group results by test type to track trends
-    const testGroups: { [key: string]: LabEntry[] } = {};
-    labResults.forEach(result => {
-      if (!testGroups[result.test]) {
-        testGroups[result.test] = [];
-      }
-      testGroups[result.test].push(result);
-    });
-
-    // Sort each group by date (most recent first)
-    Object.keys(testGroups).forEach(testName => {
-      testGroups[testName].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    });
-
-    // Priority tests to show first
-    const priorityTests = [
-      'Total Cholesterol',
-      'LDL Cholesterol', 
-      'HDL Cholesterol',
-      'Triglycerides',
-      'Glucose (fasting)',
-      'Hemoglobin',
-      'Creatinine'
-    ];
-
-    // Create metrics for priority tests first
-    priorityTests.forEach(testName => {
-      const results = testGroups[testName];
-      if (results && results.length > 0) {
-        const latest = results[0]; // Most recent result
-        const previous = results[1]; // Previous result for trend
-        
-        let trend = "No change";
-        let trendDirection: 'up' | 'down' | 'stable' = 'stable';
-        
-        if (previous) {
-          const latestValue = parseFloat(latest.result);
-          const previousValue = parseFloat(previous.result);
-          
-          if (!isNaN(latestValue) && !isNaN(previousValue)) {
-            const change = ((latestValue - previousValue) / previousValue) * 100;
-            if (Math.abs(change) > 1) {
-              trend = `${change > 0 ? '+' : ''}${change.toFixed(1)}%`;
-              trendDirection = change > 0 ? 'up' : 'down';
-            }
-          }
-        }
-
-        const getMetricColor = (status: string) => {
-          switch (status) {
-            case 'Normal': return 'green';
-            case 'Low': return 'yellow';
-            case 'High': return 'orange';
-            case 'Critical': return 'red';
-            default: return 'gray';
-          }
-        };
-
-        const getActionableInsight = (testName: string, status: string) => {
-          switch (testName.toLowerCase()) {
-            case 'total cholesterol':
-              return status === 'High' ? 'Consider dietary changes and increase fiber intake' :
-                     status === 'Low' ? 'Ensure adequate healthy fats in diet' :
-                     'Maintain current heart-healthy lifestyle';
-            case 'hdl cholesterol':
-              return status === 'Low' ? 'Increase exercise and omega-3 rich foods' :
-                     'Keep up regular physical activity';
-            case 'ldl cholesterol':
-              return status === 'High' ? 'Reduce saturated fats and increase soluble fiber' :
-                     'Continue healthy dietary habits';
-            case 'triglycerides':
-              return status === 'High' ? 'Limit sugar and refined carbs, increase exercise' :
-                     'Maintain balanced diet and activity level';
-            case 'glucose (fasting)':
-              return status === 'High' ? 'Focus on blood sugar management through diet and exercise' :
-                     status === 'Low' ? 'Ensure regular meals and balanced nutrition' :
-                     'Excellent glucose control - keep it up';
-            case 'hemoglobin':
-              return status === 'Low' ? 'Consider iron-rich foods and vitamin C for absorption' :
-                     status === 'High' ? 'Stay well hydrated and monitor with doctor' :
-                     'Good oxygen carrying capacity';
-            case 'creatinine':
-              return status === 'High' ? 'Focus on kidney health - stay hydrated and limit protein' :
-                     status === 'Low' ? 'Maintain adequate protein intake' :
-                     'Excellent kidney function';
-            default:
-              return status === 'Normal' ? 'Continue current health practices' :
-                     status === 'High' ? 'Consult healthcare provider for guidance' :
-                     'Consider lifestyle modifications or supplementation';
-          }
-        };
-
-        const getActionButton = (testName: string, status: string) => {
-          if (status === 'High' || status === 'Low' || status === 'Critical') {
-            switch (testName.toLowerCase()) {
-              case 'ldl cholesterol':
-                return undefined; // No button for LDL Cholesterol
-              case 'glucose (fasting)':
-                return { text: 'Blood Sugar Tips', action: '/catalog?search=glucose' };
-              case 'hemoglobin':
-                return { text: 'Iron Support', action: '/catalog?search=iron' };
-              default:
-                return { text: 'Learn More', action: '/catalog' };
-            }
-          }
-          return undefined;
-        };
-
-        metrics.push({
-          title: testName,
-          value: latest.result,
-          status: latest.status === 'Normal' ? 'Normal Range' : latest.status,
-          trend,
-          trendDirection,
-          color: getMetricColor(latest.status),
-          chartHeight: [60, 70, 80, 85],
-          actionableInsight: getActionableInsight(testName, latest.status),
-          actionButton: getActionButton(testName, latest.status)
-        });
-      }
-    });
-
-    // If we have less than 4 metrics, add calculated ones
-    if (metrics.length < 4) {
-      // Add overall health score based on status distribution
-      const statusCounts = labResults.reduce((acc, result) => {
-        acc[result.status] = (acc[result.status] || 0) + 1;
-        return acc;
-      }, {} as { [key: string]: number });
-
-      const totalTests = labResults.length;
-      const normalCount = statusCounts['Normal'] || 0;
-      const healthScore = totalTests > 0 ? (normalCount / totalTests * 10).toFixed(1) : '0.0';
-
-      metrics.push({
-        title: 'Overall Health Score',
-        value: `${healthScore}/10`,
-        status: normalCount / totalTests > 0.8 ? 'Excellent' : normalCount / totalTests > 0.6 ? 'Good' : 'Needs Attention',
-        trend: '+5%',
-        trendDirection: 'up',
-        color: normalCount / totalTests > 0.8 ? 'green' : normalCount / totalTests > 0.6 ? 'yellow' : 'orange',
-        chartHeight: [50, 60, 70, 72],
-        actionableInsight: normalCount / totalTests > 0.8 
-          ? 'Great job! Keep maintaining your healthy lifestyle'
-          : normalCount / totalTests > 0.6 
-          ? 'Focus on improving areas marked as High or Low'
-          : 'Priority: Address abnormal results with healthcare provider',
-        actionButton: normalCount / totalTests <= 0.6 
-          ? { text: 'Book Consultation', action: '/booking' }
-          : { text: 'View Products', action: '/catalog' }
-      });
-    }
-
-    return metrics.slice(0, 4); // Show only first 4 metrics
-  }, [labResults]);
 
   // Generate health summary and product recommendations
   const healthSummary = useMemo(() => {
@@ -429,90 +256,6 @@ const Dashboard = () => {
   useEffect(() => {
     scrollToBottom();
   }, [chatMessages]);
-
-  const handleDiscussMetricWithAI = async (metric: HealthMetric) => {
-    // Ensure chat is visible when triggered
-    setIsChatMinimized(false);
-    
-    const prompt = `Tell me about ${metric.title}: Current value is ${metric.value} with status ${metric.status}. Explain what ${metric.title} measures and its effects on health. ${metric.status !== 'Normal Range' && metric.status !== 'Normal' && metric.status !== 'Good' && metric.status !== 'Excellent' && metric.status !== 'Active' ? 'Since this value is not optimal, please provide a short suggestion on how to improve it.' : ''}`;
-
-    // Add the prompt as a user message
-    const userMessage = {
-      id: Date.now().toString(),
-      text: prompt,
-      isUser: true,
-      timestamp: new Date()
-    };
-
-    setChatMessages(prev => [...prev, userMessage]);
-    setIsTyping(true);
-
-    try {
-      // Get AI response
-      const aiResponseText = await generateAIHealthResponse(
-        prompt,
-        labResults,
-        chatMessages
-      );
-
-      const aiMessage = {
-        id: (Date.now() + 1).toString(),
-        text: aiResponseText,
-        isUser: false,
-        timestamp: new Date()
-      };
-
-      setChatMessages(prev => [...prev, aiMessage]);
-    } catch (error) {
-      console.error('Error getting AI response:', error);
-      
-      // Fallback response
-      const fallbackResponse = generateMetricFallbackResponse(metric);
-      const aiMessage = {
-        id: (Date.now() + 1).toString(),
-        text: fallbackResponse,
-        isUser: false,
-        timestamp: new Date()
-      };
-
-      setChatMessages(prev => [...prev, aiMessage]);
-    } finally {
-      setIsTyping(false);
-    }
-  };
-
-  const generateMetricFallbackResponse = (metric: HealthMetric) => {
-    const isNormal = metric.status === 'Normal Range' || metric.status === 'Normal' || metric.status === 'Good' || metric.status === 'Excellent' || metric.status === 'Active';
-    
-    switch (metric.title.toLowerCase()) {
-      case 'total cholesterol':
-        return `Total cholesterol measures the overall amount of cholesterol in your blood. It's important for cell membrane structure but elevated levels increase cardiovascular disease risk. Your current level is ${metric.value} (${metric.status}). ${!isNormal ? 'To improve: Focus on heart-healthy foods like oats, nuts, fish, and reduce saturated fats. Regular exercise helps significantly.' : 'Keep maintaining your current healthy lifestyle!'}`;
-      
-      case 'hdl cholesterol':
-        return `HDL (High-Density Lipoprotein) is "good" cholesterol that helps remove other cholesterol from arteries, protecting against heart disease. Your level is ${metric.value} (${metric.status}). ${!isNormal ? 'To improve: Increase aerobic exercise, consume omega-3 rich foods like salmon and walnuts, and maintain a healthy weight.' : 'Excellent! Your HDL levels are protective for cardiovascular health.'}`;
-      
-      case 'ldl cholesterol':
-        return `LDL (Low-Density Lipoprotein) is "bad" cholesterol that can build up in arteries, increasing heart disease risk. Your level is ${metric.value} (${metric.status}). ${!isNormal ? 'To improve: Reduce saturated and trans fats, increase soluble fiber (oats, beans), and consider plant sterols. Regular cardio exercise is very effective.' : 'Great job maintaining healthy LDL levels!'}`;
-      
-      case 'triglycerides':
-        return `Triglycerides are blood fats that provide energy. High levels increase risk of heart disease and pancreatitis. Your level is ${metric.value} (${metric.status}). ${!isNormal ? 'To improve: Limit simple carbs and sugar, reduce alcohol, increase omega-3 fatty acids, and maintain regular physical activity.' : 'Your triglyceride levels are in a healthy range.'}`;
-      
-      case 'vitamin d':
-        return `Vitamin D is crucial for bone health, immune function, and mood regulation. It helps calcium absorption and supports muscle strength. Your level is ${metric.value} (${metric.status}). ${!isNormal ? 'To improve: Increase safe sun exposure, consume fatty fish, fortified foods, or consider vitamin D3 supplements after consulting your doctor.' : 'Your vitamin D levels support optimal bone and immune health.'}`;
-      
-      case 'overall health score':
-        return `Your Overall Health Score (${metric.value}) reflects the percentage of your lab results within normal ranges. This gives a snapshot of your current health status. ${!isNormal ? 'To improve: Focus on addressing the specific abnormal results through targeted lifestyle changes and follow up with your healthcare provider.' : 'Excellent overall health! Continue your current healthy practices.'}`;
-      
-      case 'risk assessment':
-        return `Risk Assessment evaluates your potential health risks based on abnormal lab values. Your current risk level is ${metric.value}. ${!isNormal ? 'To reduce risk: Address elevated markers promptly through diet, exercise, stress management, and medical consultation as needed.' : 'Low risk indicates your biomarkers are within healthy ranges - keep up the good work!'}`;
-      
-      case 'lab tracking':
-        return `Lab Tracking monitors how consistently you monitor your health through regular testing. You have ${metric.value} showing ${metric.status} monitoring. ${!isNormal ? 'To improve: Schedule regular lab work every 3-6 months for optimal health monitoring and early detection of potential issues.' : 'Excellent health monitoring habits! Regular testing helps catch issues early.'}`;
-      
-      default:
-        return `${metric.title} shows a value of ${metric.value} with status ${metric.status}. This metric is important for tracking your overall health progress. ${!isNormal ? 'Since this value needs attention, consider discussing with your healthcare provider for personalized improvement strategies.' : 'Your levels are within a healthy range - continue your current approach!'}`;
-    }
-  };
 
   const handleChatWithAI = async () => {
     // Ensure chat is visible when triggered
@@ -728,10 +471,8 @@ const Dashboard = () => {
  {/* Health Metrics Overview */}
           <HealthMetricsOverviewSection 
             healthSummary={healthSummary}
-            healthMetrics={healthMetrics}
             labResults={labResults}
             onChatWithAI={handleChatWithAI}
-            onDiscussMetricWithAI={handleDiscussMetricWithAI}
           />
 
           {/* Lab Results Section */}

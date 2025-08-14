@@ -75,7 +75,7 @@ const Auth = () => {
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          <Card className="w-full max-w-md mx-auto lg:mx-0">
+          <Card className="w-full sm:max-w-md mx-auto lg:mx-0">
             <CardHeader>
               <CardTitle>
                 {mode === 'login' ? 'Sign In' : mode === 'register' ? 'Create Account' : 'Verify Your Email'}
