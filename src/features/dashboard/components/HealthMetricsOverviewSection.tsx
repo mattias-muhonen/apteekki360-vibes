@@ -20,12 +20,14 @@ interface HealthMetricsOverviewSectionProps {
   healthSummary: HealthSummary;
   labResults: LabEntry[];
   onChatWithAI: () => void;
+  onDiscussLabResultWithAI?: (labResult: LabEntry) => void;
 }
 
 const HealthMetricsOverviewSection: React.FC<HealthMetricsOverviewSectionProps> = ({
   healthSummary,
   labResults,
-  onChatWithAI
+  onChatWithAI,
+  onDiscussLabResultWithAI
 }) => {
   return (
     <section className="space-y-6">
@@ -296,7 +298,7 @@ const HealthMetricsOverviewSection: React.FC<HealthMetricsOverviewSectionProps> 
                             variant="outline" 
                             size="sm" 
                             className="w-full text-xs h-8 text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300 font-medium"
-                            onClick={onChatWithAI}
+                            onClick={() => onDiscussLabResultWithAI ? onDiscussLabResultWithAI(result) : onChatWithAI()}
                           >
                             💬 Discuss with AI
                           </Button>

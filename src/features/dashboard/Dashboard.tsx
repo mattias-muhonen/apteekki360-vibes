@@ -313,6 +313,91 @@ const Dashboard = () => {
     }
   };
 
+  const handleDiscussLabResultWithAI = async (labResult: LabEntry) => {
+    // Ensure chat is visible when triggered
+    setIsChatMinimized(false);
+    
+    const prompt = `Tell me about ${labResult.test}: Current value is ${labResult.result} with status ${labResult.status} (reference range: ${labResult.referenceRange}). Explain what ${labResult.test} measures and its effects on health. ${labResult.status !== 'Normal' ? 'Since this value is not optimal, please provide a short suggestion on how to improve it.' : ''}`;
+
+    // Add the prompt as a user message
+    const userMessage = {
+      id: Date.now().toString(),
+      text: prompt,
+      isUser: true,
+      timestamp: new Date()
+    };
+
+    setChatMessages(prev => [...prev, userMessage]);
+    setIsTyping(true);
+
+    try {
+      // Get AI response
+      const aiResponseText = await generateAIHealthResponse(
+        prompt,
+        labResults,
+        chatMessages
+      );
+
+      const aiMessage = {
+        id: (Date.now() + 1).toString(),
+        text: aiResponseText,
+        isUser: false,
+        timestamp: new Date()
+      };
+
+      setChatMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      
+      // Fallback response
+      const fallbackResponse = generateLabResultFallbackResponse(labResult);
+      const aiMessage = {
+        id: (Date.now() + 1).toString(),
+        text: fallbackResponse,
+        isUser: false,
+        timestamp: new Date()
+      };
+
+      setChatMessages(prev => [...prev, aiMessage]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  const generateLabResultFallbackResponse = (labResult: LabEntry) => {
+    const isNormal = labResult.status === 'Normal';
+    
+    switch (labResult.test.toLowerCase()) {
+      case 'total cholesterol':
+        return `Total cholesterol measures the overall amount of cholesterol in your blood. It's important for cell membrane structure but elevated levels increase cardiovascular disease risk. Your current level is ${labResult.result} (${labResult.status}). ${!isNormal ? 'To improve: Focus on heart-healthy foods like oats, nuts, fish, and reduce saturated fats. Regular exercise helps significantly.' : 'Keep maintaining your current healthy lifestyle!'}`;
+      
+      case 'hdl cholesterol':
+        return `HDL (High-Density Lipoprotein) is "good" cholesterol that helps remove other cholesterol from arteries, protecting against heart disease. Your level is ${labResult.result} (${labResult.status}). ${!isNormal ? 'To improve: Increase aerobic exercise, consume omega-3 rich foods like salmon and walnuts, and maintain a healthy weight.' : 'Excellent! Your HDL levels are protective for cardiovascular health.'}`;
+      
+      case 'ldl cholesterol':
+        return `LDL (Low-Density Lipoprotein) is "bad" cholesterol that can build up in arteries, increasing heart disease risk. Your level is ${labResult.result} (${labResult.status}). ${!isNormal ? 'To improve: Reduce saturated and trans fats, increase soluble fiber (oats, beans), and consider plant sterols. Regular cardio exercise is very effective.' : 'Great job maintaining healthy LDL levels!'}`;
+      
+      case 'triglycerides':
+        return `Triglycerides are blood fats that provide energy. High levels increase risk of heart disease and pancreatitis. Your level is ${labResult.result} (${labResult.status}). ${!isNormal ? 'To improve: Limit simple carbs and sugar, reduce alcohol, increase omega-3 fatty acids, and maintain regular physical activity.' : 'Your triglyceride levels are in a healthy range.'}`;
+      
+      case 'vitamin d':
+        return `Vitamin D is crucial for bone health, immune function, and mood regulation. It helps calcium absorption and supports muscle strength. Your level is ${labResult.result} (${labResult.status}). ${!isNormal ? 'To improve: Increase safe sun exposure, consume fatty fish, fortified foods, or consider vitamin D3 supplements after consulting your doctor.' : 'Your vitamin D levels support optimal bone and immune health.'}`;
+      
+      case 'glucose (fasting)':
+      case 'glucose':
+        return `Glucose is your blood sugar level, which provides energy to your cells. Your current level is ${labResult.result} (${labResult.status}). ${!isNormal ? 'To improve: Focus on balanced meals, reduce refined sugars, increase fiber intake, and maintain regular physical activity.' : 'Excellent glucose control - keep up your healthy habits!'}`;
+      
+      case 'hemoglobin':
+        return `Hemoglobin carries oxygen throughout your body. Your level is ${labResult.result} (${labResult.status}). ${!isNormal ? labResult.status === 'Low' ? 'To improve: Consider iron-rich foods like spinach, red meat, and beans, along with vitamin C for better absorption.' : 'Stay well hydrated and monitor with your healthcare provider.' : 'Good oxygen carrying capacity!'}`;
+      
+      case 'creatinine':
+        return `Creatinine is a waste product filtered by your kidneys. Your level is ${labResult.result} (${labResult.status}). ${!isNormal ? labResult.status === 'High' ? 'To improve: Stay well hydrated, limit protein intake, and avoid NSAIDs. Consult your doctor.' : 'Maintain adequate protein intake and stay hydrated.' : 'Excellent kidney function!'}`;
+      
+      default:
+        return `${labResult.test} shows a value of ${labResult.result} with status ${labResult.status} (reference range: ${labResult.referenceRange}). This metric is important for tracking your overall health progress. ${!isNormal ? 'Since this value needs attention, consider discussing with your healthcare provider for personalized improvement strategies.' : 'Your levels are within a healthy range - continue your current approach!'}`;
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!chatInput.trim()) return;
 
@@ -473,6 +558,7 @@ const Dashboard = () => {
             healthSummary={healthSummary}
             labResults={labResults}
             onChatWithAI={handleChatWithAI}
+            onDiscussLabResultWithAI={handleDiscussLabResultWithAI}
           />
 
           {/* Lab Results Section */}

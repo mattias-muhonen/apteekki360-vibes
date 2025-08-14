@@ -64,7 +64,7 @@ Guidelines:
 - Suggest consulting healthcare providers for concerning results
 - Keep responses concise but informative (2-3 paragraphs max)
 - Don't provide specific medical diagnoses or prescribe treatments
-- Don't try to do any styling with Markdown or similar, just use new lines
+- Give me a reply of few sentences without any styling or editing like ** for md
 
 User's health data context: This user has ${labResults.length} recent lab results. Focus on their specific values and trends when providing advice.`;
 
