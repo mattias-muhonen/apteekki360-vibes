@@ -555,7 +555,7 @@ const Dashboard = () => {
           )}
 
           {/* Your Recommended Action Plan Section */}
-          <ActionPlanSection />
+          <ActionPlanSection labResults={labResults} />
 
  {/* Health Metrics Overview */}
           <HealthMetricsOverviewSection 
