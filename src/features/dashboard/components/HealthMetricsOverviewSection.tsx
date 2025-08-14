@@ -176,13 +176,6 @@ const HealthMetricsOverviewSection: React.FC<HealthMetricsOverviewSectionProps> 
                       </CardHeader>
                       <CardContent className="px-4 pb-4 flex-1 flex flex-col">
                         <div className="text-2xl font-bold mb-2 text-gray-900">{result.result}</div>
-                        <div className={`text-sm font-medium mb-3 ${
-                          color === 'yellow' ? 'text-yellow-600' :
-                          color === 'orange' ? 'text-orange-600' :
-                          color === 'red' ? 'text-red-600' : 'text-gray-600'
-                        }`}>
-                          {result.status}
-                        </div>
                         
                         {/* Reference Range */}
                         <div className="text-xs text-gray-500 mb-3">
