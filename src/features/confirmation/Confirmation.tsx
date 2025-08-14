@@ -20,7 +20,7 @@ const Confirmation = () => (
           </div>
           <div className="detail-row">
             <span className="label">Location:</span>
-            <span className="value">Helsinki Central Lab</span>
+            <span className="value">Apteekki360, Siltasaarenkatu 18, Helsinki</span>
           </div>
           <div className="detail-row">
             <span className="label">Date & Time:</span>

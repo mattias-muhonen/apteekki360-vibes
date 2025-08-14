@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '../../../components/ui';
 
 interface ChatMessage {
@@ -28,6 +28,14 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   onSendMessage
 }) => {
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatMessages]);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button, Card, CardContent, CardHeader, CardTitle, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui';
 import { Upload, Image as ImageIcon, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import OpenAI from 'openai';
@@ -41,6 +41,14 @@ const LabUpload = ({ onResultsAdded }: LabUploadProps) => {
     const [processedResults, setProcessedResults] = useState<ProcessedResults | null>(null);
     const [error, setError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const resultsRef = useRef<HTMLDivElement>(null);
+
+    // Scroll to results when they arrive
+    useEffect(() => {
+        if (processedResults && resultsRef.current) {
+            resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, [processedResults]);
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -281,7 +289,7 @@ const LabUpload = ({ onResultsAdded }: LabUploadProps) => {
 
                     {/* Processed Results */}
                     {processedResults && (
-                        <Card className="border-green-200">
+                        <Card ref={resultsRef} className="border-green-200">
                             <CardHeader>
                                 <div className="flex items-center">
                                     <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
