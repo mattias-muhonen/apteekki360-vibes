@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui';
 import { cn } from '../lib/utils';
+import { Menu, X } from 'lucide-react';
 
 interface PageProps {
   children: React.ReactNode;
@@ -21,9 +22,15 @@ const Page: React.FC<PageProps> = ({
 }) => {
   const location = useLocation();
   const { isAuthenticated, logout, user } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
+    setIsMobileMenuOpen(false);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -36,6 +43,8 @@ const Page: React.FC<PageProps> = ({
                 Health360
               </Link>
             </div>
+
+            {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
               <Link 
                 to="/chat" 
@@ -110,8 +119,121 @@ const Page: React.FC<PageProps> = ({
                 </Button>
               )}
             </nav>
+
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5" />
+                )}
+              </Button>
+            </div>
           </div>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-white border-t border-gray-200">
+            <div className="px-4 py-2 space-y-1">
+              <Link 
+                to="/chat" 
+                onClick={closeMobileMenu}
+                className={cn(
+                  "block px-3 py-2 text-gray-600 hover:text-purple-600 hover:bg-gray-50 rounded-md transition-colors",
+                  location.pathname === '/chat' && "text-purple-600 bg-purple-50 font-medium"
+                )}
+              >
+                Assessment
+              </Link>
+              {isAuthenticated && (
+                <Link 
+                  to="/dashboard" 
+                  onClick={closeMobileMenu}
+                  className={cn(
+                    "block px-3 py-2 text-gray-600 hover:text-purple-600 hover:bg-gray-50 rounded-md transition-colors",
+                    location.pathname === '/dashboard' && "text-purple-600 bg-purple-50 font-medium"
+                  )}
+                >
+                  My Dashboard
+                </Link>
+              )}
+              {isAuthenticated && (
+                <Link 
+                  to="/plan" 
+                  onClick={closeMobileMenu}
+                  className={cn(
+                    "block px-3 py-2 text-gray-600 hover:text-purple-600 hover:bg-gray-50 rounded-md transition-colors",
+                    location.pathname === '/plan' && "text-purple-600 bg-purple-50 font-medium"
+                  )}
+                >
+                  My Plan
+                </Link>
+              )}
+              <Link 
+                to="/stories" 
+                onClick={closeMobileMenu}
+                className={cn(
+                  "block px-3 py-2 text-gray-600 hover:text-purple-600 hover:bg-gray-50 rounded-md transition-colors",
+                  location.pathname === '/stories' && "text-purple-600 bg-purple-50 font-medium"
+                )}
+              >
+                Stories
+              </Link>
+              <Link 
+                to="/catalog" 
+                onClick={closeMobileMenu}
+                className={cn(
+                  "block px-3 py-2 text-gray-600 hover:text-purple-600 hover:bg-gray-50 rounded-md transition-colors",
+                  location.pathname === '/catalog' && "text-purple-600 bg-purple-50 font-medium"
+                )}
+              >
+                Products
+              </Link>
+              <Link 
+                to="/booking" 
+                onClick={closeMobileMenu}
+                className={cn(
+                  "block px-3 py-2 text-gray-600 hover:text-purple-600 hover:bg-gray-50 rounded-md transition-colors",
+                  location.pathname === '/booking' && "text-purple-600 bg-purple-50 font-medium"
+                )}
+              >
+                Book Test
+              </Link>
+              
+              {/* Mobile Auth Section */}
+              <div className="pt-4 border-t border-gray-200 mt-4">
+                {isAuthenticated ? (
+                  <div className="space-y-2">
+                    <div className="px-3 py-2 text-sm text-gray-600">
+                      Welcome, {user?.name}
+                    </div>
+                    <Button 
+                      onClick={handleLogout} 
+                      variant="outline" 
+                      size="sm"
+                      className="w-full"
+                    >
+                      Logout
+                    </Button>
+                  </div>
+                ) : (
+                  <Button asChild className="w-full">
+                    <Link to="/auth" onClick={closeMobileMenu}>
+                      Login
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {title && showGradientHeader && (
