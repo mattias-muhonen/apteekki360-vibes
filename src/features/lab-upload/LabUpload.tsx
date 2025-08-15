@@ -29,9 +29,10 @@ interface ProcessedResults {
 
 interface LabUploadProps {
     onResultsAdded?: (results: ProcessedResults) => void;
+    variant?: 'default' | 'prominent';
 }
 
-const LabUpload = ({ onResultsAdded }: LabUploadProps) => {
+const LabUpload = ({ onResultsAdded, variant = 'default' }: LabUploadProps) => {
     const { user } = useAuth();
     const userDataService = UserDataService.getInstance();
     const [isOpen, setIsOpen] = useState(false);
@@ -127,7 +128,7 @@ const LabUpload = ({ onResultsAdded }: LabUploadProps) => {
                 // Parse the JSON array response
                 const labResults = JSON.parse(result);
                 console.log('PARSED RESULTS:', labResults);
-                
+
                 // Transform the API response to match our interface
                 const transformedResults: ProcessedResults = {
                     date: new Date().toISOString().split('T')[0], // Use today's date as default
@@ -163,7 +164,7 @@ const LabUpload = ({ onResultsAdded }: LabUploadProps) => {
 
     const handleSaveResults = () => {
         if (!processedResults || !user?.id) return;
-        
+
         // Transform processed results to lab entries format
         const labEntries = processedResults.results.map(result => ({
             date: processedResults.date,
@@ -172,13 +173,13 @@ const LabUpload = ({ onResultsAdded }: LabUploadProps) => {
             referenceRange: result.referenceRange,
             status: result.status
         }));
-        
+
         // Add to user data service
         userDataService.addLabResults(user.id, labEntries);
-        
+
         // Call the callback to update the dashboard
         onResultsAdded?.(processedResults);
-        
+
         console.log('Saving results:', processedResults);
 
         // Close the dialog and reset state
@@ -201,9 +202,11 @@ const LabUpload = ({ onResultsAdded }: LabUploadProps) => {
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                    <ImageIcon className="h-4 w-4 mr-2" />
-                    Upload Lab Image
+                <Button
+                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                    size="default"
+                >
+                    📋 Upload More Results
                 </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">

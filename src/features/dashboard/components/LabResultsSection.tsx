@@ -57,37 +57,66 @@ const LabResultsSection: React.FC<LabResultsSectionProps> = ({
     <section className="space-y-6">
       <div className="space-y-2">
         <h2 className="text-2xl font-bold text-gray-900">Lab Results History</h2>
-        <p className="text-gray-600">Complete history of your laboratory test results</p>
+        <p className="text-gray-600">Track your health journey and discover trends in your laboratory test results over time</p>
       </div>
       <Card className="shadow-sm border-gray-100">
         <CardHeader className="border-b border-gray-100 bg-gray-50/50">
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle className="text-xl font-semibold text-gray-900">Test Results</CardTitle>
-              <p className="text-gray-600 text-sm mt-1">Upload new results or view historical data</p>
+          {/* Encouragement section when there are results */}
+          {groupedLabResults.length > 0 && (
+            <div className="">
+              <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xl">📈</span>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-900 mb-1">
+                      Unlock Powerful Health Trends
+                    </h4>
+                    <p className="text-gray-700 text-sm mb-3">
+                      You have {groupedLabResults.length} test result{groupedLabResults.length > 1 ? 's' : ''} uploaded.
+                      Upload more results to see meaningful health trends and get more accurate AI-powered insights.
+                    </p>
+                    <LabUpload onResultsAdded={onLabResultsAdded} variant="prominent" />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="flex gap-3">
-              <LabUpload onResultsAdded={onLabResultsAdded} />
-              <Button variant="outline" size="sm" className="flex items-center gap-2">
-                <span>➕</span>
-                Add Manual Result
-              </Button>
-            </div>
-          </div>
+          )}
         </CardHeader>
         <CardContent className="p-6">
           <div className="space-y-4">
             {groupedLabResults.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-400 text-lg">No results to show</p>
-                <p className="text-gray-300 text-sm mt-2">Upload lab images to see your results here</p>
+              <div className="text-center py-12 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-dashed border-blue-200">
+                <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">📈</span>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Start Your Health Journey</h3>
+                <p className="text-gray-600 text-base mb-4 max-w-md mx-auto">
+                  Upload your lab results to unlock powerful health insights and track your progress over time.
+                </p>
+                <div className="space-y-2 text-sm text-gray-500 mb-6">
+                  <div className="flex items-center justify-center gap-2">
+                    <span>✨</span>
+                    <span>AI-powered health analysis</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-2">
+                    <span>📊</span>
+                    <span>Personalized trend tracking</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-2">
+                    <span>🎯</span>
+                    <span>Actionable health recommendations</span>
+                  </div>
+                </div>
+                <LabUpload onResultsAdded={onLabResultsAdded} variant="prominent" />
               </div>
             ) : (
               groupedLabResults.map((dateGroup) => {
                 const isExpanded = expandedAccordions.includes(dateGroup.date);
                 return (
                   <Card key={dateGroup.date} className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                    <CardHeader 
+                    <CardHeader
                       className="cursor-pointer hover:bg-gray-50 transition-colors p-4"
                       onClick={() => onToggleAccordion(dateGroup.date)}
                     >
@@ -102,10 +131,10 @@ const LabResultsSection: React.FC<LabResultsSectionProps> = ({
                           <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(dateGroup.overallStatus)}`}>
                             {dateGroup.statusText}
                           </span>
-                          <svg 
-                            className={`w-5 h-5 text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
-                            fill="none" 
-                            stroke="currentColor" 
+                          <svg
+                            className={`w-5 h-5 text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
                             viewBox="0 0 24 24"
                           >
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
