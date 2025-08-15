@@ -219,23 +219,30 @@ const Auth = () => {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Member Benefits</CardTitle>
-                <CardDescription>Join Health360 and unlock exclusive features</CardDescription>
+                <CardTitle>Account Required for Full Features</CardTitle>
+                <CardDescription>Create an account to analyze lab results and track your health journey</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
-                    <div className="text-2xl">💾</div>
+                    <div className="text-2xl">🧪</div>
                     <div>
-                      <h4 className="font-medium text-gray-900">Save Your Progress</h4>
-                      <p className="text-sm text-gray-600">Keep track of your health assessments and recommendations</p>
+                      <h4 className="font-medium text-gray-900">Lab Results Analysis</h4>
+                      <p className="text-sm text-gray-600">Upload and get AI-powered insights from your lab reports (Account Required)</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="text-2xl">📊</div>
                     <div>
-                      <h4 className="font-medium text-gray-900">Track Lab Results</h4>
-                      <p className="text-sm text-gray-600">Monitor your testosterone and health metrics over time</p>
+                      <h4 className="font-medium text-gray-900">Health Trend Tracking</h4>
+                      <p className="text-sm text-gray-600">Monitor your testosterone and health metrics over time (Account Required)</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="text-2xl">💾</div>
+                    <div>
+                      <h4 className="font-medium text-gray-900">Save Your Progress</h4>
+                      <p className="text-sm text-gray-600">Keep track of your health assessments and recommendations</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
