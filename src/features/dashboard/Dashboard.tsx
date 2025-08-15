@@ -544,7 +544,6 @@ const Dashboard = () => {
             labResults={labResults}
             onChatWithAI={handleChatWithAI}
             onDiscussLabResultWithAI={handleDiscussLabResultWithAI}
-            onLabResultsAdded={handleLabResultsAdded}
           />
 
           {/* Product Recommendations Section */}

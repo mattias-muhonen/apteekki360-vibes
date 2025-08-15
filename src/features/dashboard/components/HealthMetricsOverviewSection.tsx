@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Card, CardContent, CardHeader, CardTitle } from '../../../components/ui';
-import LabUpload from '../../lab-upload/LabUpload';
 import OpenAI from 'openai';
 
 interface LabEntry {
@@ -32,15 +31,13 @@ interface HealthMetricsOverviewSectionProps {
   labResults: LabEntry[];
   onChatWithAI: () => void;
   onDiscussLabResultWithAI?: (labResult: LabEntry) => void;
-  onLabResultsAdded?: (results: any) => void;
 }
 
 const HealthMetricsOverviewSection: React.FC<HealthMetricsOverviewSectionProps> = ({
   healthSummary,
   labResults,
   onChatWithAI,
-  onDiscussLabResultWithAI,
-  onLabResultsAdded
+  onDiscussLabResultWithAI
 }) => {
   const [bloodPanelRecommendation, setBloodPanelRecommendation] = useState<BloodPanelRecommendation | null>(null);
   const [isLoadingRecommendation, setIsLoadingRecommendation] = useState(false);
@@ -153,7 +150,12 @@ Make the panel name specific and medical-sounding, not generic. Include 5 key te
               Upload your lab results to see detailed health metrics, trends, and personalized insights about your health status.
             </p>
             <div className="flex justify-center">
-              <LabUpload onResultsAdded={onLabResultsAdded} />
+              <Button asChild>
+                <Link to="/lab-upload" className="flex items-center gap-2">
+                  <span>📊</span>
+                  Upload Lab Results
+                </Link>
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -189,9 +191,6 @@ Make the panel name specific and medical-sounding, not generic. Include 5 key te
               </div>
             </div>
             <div className="flex flex-wrap justify-center gap-3">
-              <div className="w-full max-w-md">
-                <LabUpload onResultsAdded={onLabResultsAdded} />
-              </div>
               <Button size="sm" variant="outline" onClick={onChatWithAI} className="flex items-center gap-2">
                 <span>💬</span>
                 Chat with AI about maintaining health
@@ -222,9 +221,12 @@ Make the panel name specific and medical-sounding, not generic. Include 5 key te
                 </div>
               </div>
               <div className="flex flex-wrap gap-3">
-                <div className="w-full sm:w-auto">
-                  <LabUpload onResultsAdded={onLabResultsAdded} />
-                </div>
+                <Button asChild>
+                  <Link to="/lab-upload" className="flex items-center gap-2">
+                    <span>📊</span>
+                    Upload New Results
+                  </Link>
+                </Button>
                 <Button size="sm" variant="outline" onClick={onChatWithAI} className="flex items-center gap-2">
                   <span>💬</span>
                   Chat with AI about your results
@@ -318,7 +320,12 @@ Make the panel name specific and medical-sounding, not generic. Include 5 key te
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-gray-900">Detailed Lab Results Analysis</h3>
               <div className="flex items-center gap-3">
-                <LabUpload onResultsAdded={onLabResultsAdded} />
+                <Button size="sm" asChild>
+                  <Link to="/lab-upload" className="flex items-center gap-2">
+                    <span>📊</span>
+                    Upload More Results
+                  </Link>
+                </Button>
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
