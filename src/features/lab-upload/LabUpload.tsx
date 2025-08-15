@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button, Card, CardContent, CardHeader, CardTitle, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui';
-import { Upload, Image as ImageIcon, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import OpenAI from 'openai';
 import { useAuth } from '../../contexts/AuthContext';
 import UserDataService from '../../services/userDataService';
@@ -29,10 +29,9 @@ interface ProcessedResults {
 
 interface LabUploadProps {
     onResultsAdded?: (results: ProcessedResults) => void;
-    variant?: 'default' | 'prominent';
 }
 
-const LabUpload = ({ onResultsAdded, variant = 'default' }: LabUploadProps) => {
+const LabUpload = ({ onResultsAdded }: LabUploadProps) => {
     const { user } = useAuth();
     const userDataService = UserDataService.getInstance();
     const [isOpen, setIsOpen] = useState(false);

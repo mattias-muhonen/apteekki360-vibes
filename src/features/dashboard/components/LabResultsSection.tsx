@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Card, CardContent, CardHeader, CardTitle } from '../../../components/ui';
+import { Button, Card, CardContent, CardHeader } from '../../../components/ui';
 import LabUpload from '../../lab-upload/LabUpload';
 import { Trash2 } from 'lucide-react';
 
@@ -77,7 +77,7 @@ const LabResultsSection: React.FC<LabResultsSectionProps> = ({
                       You have {groupedLabResults.length} test result{groupedLabResults.length > 1 ? 's' : ''} uploaded.
                       Upload more results to see meaningful health trends and get more accurate AI-powered insights.
                     </p>
-                    <LabUpload onResultsAdded={onLabResultsAdded} variant="prominent" />
+                    <LabUpload onResultsAdded={onLabResultsAdded} />
                   </div>
                 </div>
               </div>
@@ -109,7 +109,7 @@ const LabResultsSection: React.FC<LabResultsSectionProps> = ({
                     <span>Actionable health recommendations</span>
                   </div>
                 </div>
-                <LabUpload onResultsAdded={onLabResultsAdded} variant="prominent" />
+                <LabUpload onResultsAdded={onLabResultsAdded} />
               </div>
             ) : (
               groupedLabResults.map((dateGroup) => {
