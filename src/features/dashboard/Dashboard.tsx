@@ -547,9 +547,8 @@ const Dashboard = () => {
           />
 
           {/* Product Recommendations Section */}
-          {labResults.length > 0 && healthSummary.recommendations.length > 0 && (
+          {labResults.length > 0 && (
             <ProductRecommendationsSection 
-              recommendations={healthSummary.recommendations} 
               labResults={labResults}
             />
           )}

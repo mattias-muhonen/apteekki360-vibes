@@ -6,13 +6,12 @@ import { products } from '../../../products';
 import type { LabEntry } from '../../../services/openai';
 import OpenAI from 'openai';
 
+
 interface ProductRecommendationsSectionProps {
-  recommendations: Product[];
   labResults?: LabEntry[];
 }
 
 const ProductRecommendationsSection: React.FC<ProductRecommendationsSectionProps> = ({
-  recommendations,
   labResults = []
 }) => {
   const [aiRecommendedProducts, setAiRecommendedProducts] = useState<Product[]>([]);
@@ -183,29 +182,23 @@ Respond with only the exact product names, one per line, no additional text or f
     image_url: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=400&fit=crop&auto=format"
   };
 
-  // Show AI recommendations if we have abnormal results, otherwise show original recommendations
+
+  // Show AI recommendations if we have abnormal results, otherwise show manual recommendations from products.ts
   const baseProducts = abnormalLabResults.length > 0 
     ? (showMoreProducts ? allRecommendations : aiRecommendedProducts)
-    : (showMoreProducts ? recommendations : recommendations.slice(0, 2));
-  
+    : (showMoreProducts ? products.slice(0, 6) : products.slice(0, 2));
   // Always add blood test as first recommendation, then show other products
   const displayProducts = baseProducts.length > 0 
     ? [bloodTestRecommendation, ...baseProducts]
     : [bloodTestRecommendation];
 
   const handleShowMoreProducts = () => {
-    if (abnormalLabResults.length > 0) {
-      // For abnormal results, show all AI recommendations
-      setShowMoreProducts(true);
-    } else {
-      // For normal results, show all original recommendations
-      setShowMoreProducts(true);
-    }
+    setShowMoreProducts(!showMoreProducts);
   };
 
   const hasMoreProducts = abnormalLabResults.length > 0 
     ? allRecommendations.length > 2
-    : recommendations.length > 2;
+    : products.length > 2;
 
   if (displayProducts.length === 0 && !isLoading && !error && !allResultsNormal) {
     return null;
@@ -308,10 +301,7 @@ Respond with only the exact product names, one per line, no additional text or f
                     {!(index === 0 && product.name === "Blood Test Monitoring") && product.name}
                   </h3>
                   <p className="text-xs text-gray-600 mb-3 line-clamp-3 leading-relaxed flex-1">
-                    {product.description ? 
-                      product.description.substring(0, 120) + '...' : 
-                      'Quality health product to support your wellness journey'
-                    }
+                    {product.description}
                   </p>
                   <div className="flex items-center justify-between mt-auto">
                     <span className="text-lg font-bold text-green-600">{product.price}</span>
