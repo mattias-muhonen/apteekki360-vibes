@@ -13,9 +13,11 @@ const Landing = () => (
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
                 Take control of your health
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-purple-100 leading-relaxed">
-              Use our AI-powered symptom checker to understand your health concerns and upload your lab results 
-              for personalized insights and recommendations.
+            <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-purple-100 leading-relaxed">
+              Health360 is your holistic wellbeing navigator and companion
+            </h2>
+            <p className="text-lg md:text-xl mb-8 text-purple-100 leading-relaxed">
+              Our aim is to provide a seamless, personalized experience that empowers you to understand your unique biological blueprint, make informed decisions, and consistently progress towards your health and longevity goals.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
               {/* Lab Test Interpretation Card */}
