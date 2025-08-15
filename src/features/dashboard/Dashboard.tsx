@@ -59,7 +59,7 @@ const Dashboard = () => {
   ]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [isChatMinimized, setIsChatMinimized] = useState(false);
+  const [isChatMinimized, setIsChatMinimized] = useState(true);
 
   // Load user lab results from userDataService
   useEffect(() => {
@@ -548,7 +548,7 @@ const Dashboard = () => {
           />
 
           {/* Product Recommendations Section */}
-          {healthSummary.recommendations.length > 0 && (
+          {labResults.length > 0 && healthSummary.recommendations.length > 0 && (
             <ProductRecommendationsSection 
               recommendations={healthSummary.recommendations} 
               labResults={labResults}
@@ -556,7 +556,9 @@ const Dashboard = () => {
           )}
 
           {/* Your Recommended Action Plan Section */}
-          <ActionPlanSection labResults={labResults} />
+          {labResults.length > 0 && (
+            <ActionPlanSection labResults={labResults} />
+          )}
 
 
 
