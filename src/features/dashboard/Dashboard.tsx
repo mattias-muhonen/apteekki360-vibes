@@ -563,15 +563,17 @@ const Dashboard = () => {
 
 
           {/* Lab Results Section */}
-          <LabResultsSection 
-            groupedLabResults={groupedLabResults}
-            expandedAccordions={expandedAccordions}
-            onLabResultsAdded={handleLabResultsAdded}
-            onToggleAccordion={toggleAccordion}
-            onDeleteLabResult={handleDeleteLabResult}
-            onDeleteDateGroup={handleDeleteDateGroup}
-            getStatusColor={getStatusColor}
-          />
+          {labResults.length > 0 && (
+            <LabResultsSection 
+              groupedLabResults={groupedLabResults}
+              expandedAccordions={expandedAccordions}
+              onLabResultsAdded={handleLabResultsAdded}
+              onToggleAccordion={toggleAccordion}
+              onDeleteLabResult={handleDeleteLabResult}
+              onDeleteDateGroup={handleDeleteDateGroup}
+              getStatusColor={getStatusColor}
+            />
+          )}
         </div>
 
         {/* Chat Panel - Right Side */}
