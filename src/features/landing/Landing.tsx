@@ -25,7 +25,7 @@ const Landing = () => (
                 <CardHeader className="text-center">
                   <CardTitle className="text-xl font-semibold">AI Symptom Checker</CardTitle>
                   <CardDescription className="text-purple-100">
-                    Take our comprehensive health assessment to get personalized recommendations
+                    Take our free health assessment to get personalized recommendations.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="text-center">
@@ -44,7 +44,7 @@ const Landing = () => (
                 <CardHeader className="text-center">
                   <CardTitle className="text-xl font-semibold">Lab Test Interpretation</CardTitle>
                   <CardDescription className="text-purple-100">
-                    Upload your lab results and get AI-powered insights into your health metrics
+                    Register or log-in  and upload your lab results to get personalised AI-powered insights and recommendations.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="text-center">
