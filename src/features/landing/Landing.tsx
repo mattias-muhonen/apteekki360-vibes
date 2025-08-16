@@ -77,44 +77,44 @@ const Landing = () => (
             <Card className="text-center border-0 shadow-lg">
               <CardHeader>
                 <div className="text-4xl mb-4">🤖</div>
-                <CardTitle className="text-xl">AI Health Assessment</CardTitle>
+                <CardTitle className="text-xl">Private, Fast Answers</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Get personalized insights through our intelligent chat system that understands your symptoms and health goals.
+                  Start with a quick, anonymous check—no account needed. Get clear, evidence-based guidance in just two minutes.
                 </CardDescription>
               </CardContent>
             </Card>
             <Card className="text-center border-0 shadow-lg">
               <CardHeader>
                 <div className="text-4xl mb-4">🧪</div>
-                <CardTitle className="text-xl">Lab Results Tracking</CardTitle>
+                <CardTitle className="text-xl">Personal Plans, Not Generic Advice</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Monitor your testosterone levels, energy scores, and other key health metrics with comprehensive tracking tools.
+                  Your results and recommendations are tailored to your symptoms, goals, and lab data—not a one-size-fits-all script.
                 </CardDescription>
               </CardContent>
             </Card>
             <Card className="text-center border-0 shadow-lg">
               <CardHeader>
                 <div className="text-4xl mb-4">💊</div>
-                <CardTitle className="text-xl">Finnish Pharmacy Products</CardTitle>
+                <CardTitle className="text-xl">All-in-One Care Pathway</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Access authentic supplements and health products from trusted Finnish pharmacy Apteekki360.fi.
+                  Book labs, chat with professionals, and access trusted products and services—all in one seamless platform.
                 </CardDescription>
               </CardContent>
             </Card>
             <Card className="text-center border-0 shadow-lg">
               <CardHeader>
                 <div className="text-4xl mb-4">📊</div>
-                <CardTitle className="text-xl">Progress Dashboard</CardTitle>
+                <CardTitle className="text-xl">Built for Real Progress</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Track your health journey with detailed dashboards and progress reports tailored to your goals.
+                  Move from confusion to action with step-by-step plans, reminders, and ongoing support—so you actually see results.
                 </CardDescription>
               </CardContent>
             </Card>
