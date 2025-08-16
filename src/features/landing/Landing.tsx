@@ -20,30 +20,9 @@ const Landing = () => (
               Our aim is to provide a seamless, personalized experience that empowers you to understand your unique biological blueprint, make informed decisions, and consistently progress towards your health and longevity goals.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
-              {/* Lab Test Interpretation Card */}
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/15 transition-all duration-300">
-                <CardHeader className="text-center">
-                  <div className="text-4xl mb-3">🧪</div>
-                  <CardTitle className="text-xl font-semibold">Lab Test Interpretation</CardTitle>
-                  <CardDescription className="text-purple-100">
-                    Upload your lab results and get AI-powered insights into your health metrics
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <Button 
-                    size="lg" 
-                    asChild 
-                    className="w-full bg-white text-purple-600 hover:bg-gray-100 font-semibold"
-                  >
-                    <Link to="/dashboard">Upload Your Lab Test</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-
               {/* AI Symptom Checker Card */}
               <Card className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/15 transition-all duration-300">
                 <CardHeader className="text-center">
-                  <div className="text-4xl mb-3">🤖</div>
                   <CardTitle className="text-xl font-semibold">AI Symptom Checker</CardTitle>
                   <CardDescription className="text-purple-100">
                     Take our comprehensive health assessment to get personalized recommendations
@@ -56,6 +35,25 @@ const Landing = () => (
                     className="w-full bg-transparent border-2 border-white text-white hover:bg-white hover:text-purple-600 transition-colors font-semibold"
                   >
                     <Link to="/chat">Start Assessment</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Lab Test Interpretation Card */}
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/15 transition-all duration-300">
+                <CardHeader className="text-center">
+                  <CardTitle className="text-xl font-semibold">Lab Test Interpretation</CardTitle>
+                  <CardDescription className="text-purple-100">
+                    Upload your lab results and get AI-powered insights into your health metrics
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <Button 
+                    size="lg" 
+                    asChild 
+                    className="w-full bg-white text-purple-600 hover:bg-gray-100 font-semibold"
+                  >
+                    <Link to="/dashboard">Upload Your Lab Test</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -76,7 +74,6 @@ const Landing = () => (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <Card className="text-center border-0 shadow-lg">
               <CardHeader>
-                <div className="text-4xl mb-4">🤖</div>
                 <CardTitle className="text-xl">Private, Fast Answers</CardTitle>
               </CardHeader>
               <CardContent>
@@ -87,7 +84,6 @@ const Landing = () => (
             </Card>
             <Card className="text-center border-0 shadow-lg">
               <CardHeader>
-                <div className="text-4xl mb-4">🧪</div>
                 <CardTitle className="text-xl">Personal Plans, Not Generic Advice</CardTitle>
               </CardHeader>
               <CardContent>
@@ -98,7 +94,6 @@ const Landing = () => (
             </Card>
             <Card className="text-center border-0 shadow-lg">
               <CardHeader>
-                <div className="text-4xl mb-4">💊</div>
                 <CardTitle className="text-xl">All-in-One Care Pathway</CardTitle>
               </CardHeader>
               <CardContent>
@@ -109,7 +104,6 @@ const Landing = () => (
             </Card>
             <Card className="text-center border-0 shadow-lg">
               <CardHeader>
-                <div className="text-4xl mb-4">📊</div>
                 <CardTitle className="text-xl">Built for Real Progress</CardTitle>
               </CardHeader>
               <CardContent>
