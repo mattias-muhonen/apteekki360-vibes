@@ -7,7 +7,7 @@ const Landing = () => (
   <Page>
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 text-white">
+  <section className="bg-gradient-to-br from-[#53846aff] via-[#3a5c4d] to-[#254034] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
