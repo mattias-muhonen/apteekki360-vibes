@@ -66,10 +66,10 @@ const Auth = () => {
 
   return (
     <Page 
-      title={mode === 'login' ? 'Welcome Back' : 'Join Health360'}
+      title={mode === 'login' ? 'Lab results interpretation' : 'Join Health360'}
       subtitle={
         mode === 'login' 
-          ? 'Sign in to access your health dashboard and track your progress'
+          ? 'Sign in to upload lab results and access to AI assisted health dashboard for intepertation.'
           : 'Create your account to save recommendations and track your health journey'
       }
     >
