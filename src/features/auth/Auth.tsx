@@ -219,7 +219,7 @@ const Auth = () => {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Account Required for Full Features</CardTitle>
+                <CardTitle>Login or register for full features</CardTitle>
                 <CardDescription>Create an account to analyze lab results and track your health journey</CardDescription>
               </CardHeader>
               <CardContent>
@@ -227,35 +227,35 @@ const Auth = () => {
                   <div className="flex items-start space-x-3">
                     <div className="text-2xl">🧪</div>
                     <div>
-                      <h4 className="font-medium text-gray-900">Lab Results Analysis</h4>
-                      <p className="text-sm text-gray-600">Upload and get AI-powered insights from your lab reports (Account Required)</p>
+                      <h4 className="font-medium text-gray-900">Multiple lab results analysis</h4>
+                      <p className="text-sm text-gray-600">Upload and get AI-powered intepretation from your lab reports (Account Required)</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="text-2xl">📊</div>
                     <div>
-                      <h4 className="font-medium text-gray-900">Health Trend Tracking</h4>
+                      <h4 className="font-medium text-gray-900">Health trend tracking</h4>
                       <p className="text-sm text-gray-600">Monitor your testosterone and health metrics over time (Account Required)</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="text-2xl">💾</div>
                     <div>
-                      <h4 className="font-medium text-gray-900">Save Your Progress</h4>
+                      <h4 className="font-medium text-gray-900">Save your results and progress</h4>
                       <p className="text-sm text-gray-600">Keep track of your health assessments and recommendations</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="text-2xl">💰</div>
                     <div>
-                      <h4 className="font-medium text-gray-900">Member Pricing</h4>
+                      <h4 className="font-medium text-gray-900">Member pricing</h4>
                       <p className="text-sm text-gray-600">Save 15-25% on supplements and lab tests</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="text-2xl">🔬</div>
                     <div>
-                      <h4 className="font-medium text-gray-900">Priority Booking</h4>
+                      <h4 className="font-medium text-gray-900">Priority booking and one click buying of supplements</h4>
                       <p className="text-sm text-gray-600">Get faster access to lab appointments and consultations</p>
                     </div>
                   </div>
