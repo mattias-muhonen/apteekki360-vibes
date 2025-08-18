@@ -11,7 +11,7 @@ interface LabResult {
   unit?: string;
 }
 
-interface ProcessedResults {
+export interface ProcessedResults {
   date: string;
   results: LabResult[];
   confidence: number;

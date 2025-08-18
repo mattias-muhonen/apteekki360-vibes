@@ -542,6 +542,7 @@ const Dashboard = () => {
           <HealthMetricsOverviewSection 
             healthSummary={healthSummary}
             labResults={labResults}
+            onLabResultsAdded={handleLabResultsAdded}
             onChatWithAI={handleChatWithAI}
             onDiscussLabResultWithAI={handleDiscussLabResultWithAI}
           />

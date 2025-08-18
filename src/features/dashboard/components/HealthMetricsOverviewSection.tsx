@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Card, CardContent, CardHeader, CardTitle } from '../../../components/ui';
 import OpenAI from 'openai';
+import type { ProcessedResults } from './LabResultsSection';
+import LabUpload from '../../lab-upload/LabUpload';
 
 interface LabEntry {
   date: string;
@@ -31,13 +33,15 @@ interface HealthMetricsOverviewSectionProps {
   labResults: LabEntry[];
   onChatWithAI: () => void;
   onDiscussLabResultWithAI?: (labResult: LabEntry) => void;
+  onLabResultsAdded: (results: ProcessedResults) => void;
 }
 
 const HealthMetricsOverviewSection: React.FC<HealthMetricsOverviewSectionProps> = ({
   healthSummary,
   labResults,
   onChatWithAI,
-  onDiscussLabResultWithAI
+  onDiscussLabResultWithAI,
+  onLabResultsAdded
 }) => {
   const [bloodPanelRecommendation, setBloodPanelRecommendation] = useState<BloodPanelRecommendation | null>(null);
   const [isLoadingRecommendation, setIsLoadingRecommendation] = useState(false);
@@ -221,12 +225,7 @@ Make the panel name specific and medical-sounding, not generic. Include 5 key te
                 </div>
               </div>
               <div className="flex flex-wrap gap-3">
-                <Button asChild>
-                  <Link to="/lab-upload" className="flex items-center gap-2">
-                    <span>📊</span>
-                    Upload New Results
-                  </Link>
-                </Button>
+                <LabUpload onResultsAdded={onLabResultsAdded} />
                 <Button size="sm" variant="outline" onClick={onChatWithAI} className="flex items-center gap-2">
                   <span>💬</span>
                   Chat with AI about your results
