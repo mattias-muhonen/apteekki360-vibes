@@ -313,14 +313,6 @@ Make the panel name specific and medical-sounding, not generic. Include 5 key te
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-gray-900">Detailed Lab Results Analysis</h3>
-              <div className="flex items-center gap-3">
-                <Button size="sm" asChild>
-                  <Link to="/lab-upload" className="flex items-center gap-2">
-                    <span>📊</span>
-                    Upload More Results
-                  </Link>
-                </Button>
-              </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {labResults
