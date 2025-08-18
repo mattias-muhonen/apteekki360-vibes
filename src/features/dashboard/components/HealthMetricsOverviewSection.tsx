@@ -225,12 +225,6 @@ Make the panel name specific and medical-sounding, not generic. Include 5 key te
                   <span>💬</span>
                   Chat with AI about your results
                 </Button>
-                <Button size="sm" asChild>
-                  <Link to="/booking" className="flex items-center gap-2">
-                    <span>📅</span>
-                      Book Blood Panel
-                  </Link>
-                </Button>
                 {hasAbnormalResults && isLoadingRecommendation && (
                   <Button size="sm" variant="outline" disabled className="flex items-center gap-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
