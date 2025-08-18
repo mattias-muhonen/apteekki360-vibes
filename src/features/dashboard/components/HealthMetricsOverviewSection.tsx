@@ -154,12 +154,7 @@ Make the panel name specific and medical-sounding, not generic. Include 5 key te
               Upload your lab results to see detailed health metrics, trends, and personalized insights about your health status.
             </p>
             <div className="flex justify-center">
-              <Button asChild>
-                <Link to="/lab-upload" className="flex items-center gap-2">
-                  <span>📊</span>
-                  Upload Lab Results
-                </Link>
-              </Button>
+              <LabUpload onResultsAdded={onLabResultsAdded} />
             </div>
           </CardContent>
         </Card>
