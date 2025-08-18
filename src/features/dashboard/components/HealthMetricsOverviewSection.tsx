@@ -228,7 +228,7 @@ Make the panel name specific and medical-sounding, not generic. Include 5 key te
                 <Button size="sm" asChild>
                   <Link to="/booking" className="flex items-center gap-2">
                     <span>📅</span>
-                    Book Consultation
+                      Book Blood Panel
                   </Link>
                 </Button>
                 {hasAbnormalResults && isLoadingRecommendation && (
