@@ -276,7 +276,15 @@ To get your detailed results and personalized product recommendations, you can v
       return ['I feel tired all the time', 'Low energy and motivation', 'Sleep problems', 'Stress and anxiety'];
     }
     if (currentStep === 1) {
-      return ['25 years old', '35 years old', '45 years old', 'Over 50'];
+      return [
+        'Under 18',
+        '18–24',
+        '25–34',
+        '35–44',
+        '45–54',
+        '55–64',
+        '65+'
+      ];
     }
     if (currentStep === 2) {
       return ['Poor sleep quality', 'Wake up tired', 'Sleep well', 'Trouble falling asleep'];
