@@ -185,7 +185,8 @@ const Landing = () => (
             </div>
           </div>
           <div className="border-t border-gray-800 mt-12 pt-8 text-center">
-            <p className="text-gray-400">&copy; 2025 Health360. All rights reserved. In partnership with Apteekki360.fi</p>
+            <p className="text-gray-400">&copy; 2025 Health360. All rights reserved.</p>
+            <p className="text-gray-400">Powered by Apteekki360</p>
           </div>
         </div>
       </footer>
