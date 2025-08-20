@@ -8,7 +8,7 @@ const Auth = () => {
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [mode, setMode] = useState<'login' | 'register' | 'otp'>('login');
-  const [email, setEmail] = useState('demo@health360.com');
+  const [email, setEmail] = useState('Demo@health360.com');
   const [password, setPassword] = useState('sdfasfdkahflaksjhdfaksjdfhalskjdhfalskjfhaslkfjhaslkfdhjalskdfjhalskdfhjalskdjfh');
   const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -105,7 +105,7 @@ const Auth = () => {
                         id="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="demo@health360.com"
+                        placeholder="Demo@health360.com"
                         required
                         disabled={isLoading}
                       />

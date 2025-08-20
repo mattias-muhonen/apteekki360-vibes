@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui';
 import { cn } from '../lib/utils';
 import { Menu, X } from 'lucide-react';
+import UserDataService from '../services/userDataService';
 
 interface PageProps {
   children: React.ReactNode;
@@ -26,6 +27,7 @@ const Page: React.FC<PageProps> = ({
 
   const handleLogout = () => {
     logout();
+    UserDataService.getInstance().logout();
     setIsMobileMenuOpen(false);
   };
 
