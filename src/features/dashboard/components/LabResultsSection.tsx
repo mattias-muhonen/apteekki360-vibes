@@ -74,7 +74,6 @@ const LabResultsSection: React.FC<LabResultsSectionProps> = ({
                       Unlock Powerful Health Trends
                     </h4>
                     <p className="text-gray-700 text-sm mb-3">
-                      You have {groupedLabResults.length} test result{groupedLabResults.length > 1 ? 's' : ''} uploaded.
                       Upload more results to see meaningful health trends and get more accurate AI-powered insights.
                     </p>
                     <LabUpload onResultsAdded={onLabResultsAdded} />
